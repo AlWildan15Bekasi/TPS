@@ -358,7 +358,7 @@
                             <div class="absolute inset-0 bg-hero-pattern opacity-10 pointer-events-none"></div>
                             
                             <div class="relative z-10 mb-4 flex flex-col items-center w-full">
-                                <span class="px-3 py-1 bg-green-500/20 text-green-400 text-[10px] font-bold uppercase tracking-widest rounded-full border border-green-500/30 mb-2 animate-pulse"><i class="fa-solid fa-video mr-1"></i> Smart Validation</span>
+                                <span class="px-3 py-1 bg-green-500/20 text-green-400 text-[10px] font-bold uppercase tracking-widest rounded-full border border-green-500/30 mb-2 animate-pulse"><i class="fa-solid fa-video mr-1"></i> Smart Validation v4.0</span>
                                 <h3 id="scan-mode-title" class="text-white font-bold text-xl tracking-tight">Check In Mode</h3>
                             </div>
                             
@@ -373,7 +373,7 @@
                                     <p class="text-white font-bold tracking-widest text-sm animate-pulse">MEMVALIDASI...</p>
                                 </div>
                             </div>
-                            <p class="text-slate-400 text-[11px] sm:text-xs text-center relative z-10 px-2 sm:px-4 mb-4 leading-relaxed">Arahkan kamera ke QR Code kelas. Sistem akan otomatis mendeteksi dan memvalidasi jadwal mengajar Anda.</p>
+                            <p class="text-slate-400 text-[11px] sm:text-xs text-center relative z-10 px-2 sm:px-4 mb-4 leading-relaxed">Arahkan kamera ke QR Code kelas. Sistem akan otomatis mendeteksi dan memvalidasi JP Anda.</p>
                             
                             <button id="btn-toggle-camera" onclick="toggleCamera()" class="relative z-10 w-full sm:w-auto px-6 py-3.5 bg-awBlue hover:bg-blue-800 text-white text-sm font-bold rounded-xl transition-all shadow-[0_4px_14px_rgba(0,32,178,0.3)]">
                                 <i class="fa-solid fa-camera mr-2"></i> Nyalakan Kamera
@@ -387,17 +387,14 @@
 
     <script>
         // ==========================================
-        // SUPABASE CONFIGURATION (ISI DENGAN KREDENSIALMU)
+        // SUPABASE CONFIGURATION
         // ==========================================
-        // WAJIB DIGANTI: Gunakan URL project Supabase aslimu (harus diawali https://)
         const _SUPABASE_URL = 'https://zlevdietbawaxdzgbznc.supabase.co'; 
         const _SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsZXZkaWV0YmF3YXhkemdiem5jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkwMDkyNzUsImV4cCI6MjEwNDU4NTI3NX0.9r0NjDpjLI4YahsCty_nl9aUKt8IU-71sWKm26xz7co';
         
-        // FIX: Ubah nama variabel menjadi supabaseClient agar tidak bentrok dengan global 'supabase' dari CDN
         const supabaseClient = window.supabase.createClient(_SUPABASE_URL, _SUPABASE_ANON_KEY);
-        const STORAGE_BUCKET = 'berkas_portal'; // Pastikan membuat bucket ini dan set ke PUBLIC
+        const STORAGE_BUCKET = 'berkas_portal';
 
-        // State now explicitly expects arrays for events and commissions
         let appState = {
             user: null, 
             teacherList: [],
@@ -409,21 +406,27 @@
         let isScannerRunning = false;
         let currentFacingMode = "environment"; 
 
-        // Helper: Get Current Day in Indonesian
+        // --- TIME HELPER FUNCTIONS ---
         function getHariIniStr() {
             const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
             return days[new Date().getDay()];
         }
 
-        // Helper: Get YYYY-MM-DD
         function getTodayDateStr() {
             const d = new Date();
             return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
         }
 
-        // Helper: Get HH:MM:SS
         function getCurrentTimeStr() {
             const d = new Date();
+            return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
+        }
+
+        function adjustTimeStr(timeStr, minutesToAdd) {
+            let [h, m, s] = timeStr.split(':').map(Number);
+            let d = new Date();
+            d.setHours(h, m, s || 0);
+            d.setMinutes(d.getMinutes() + minutesToAdd);
             return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
         }
 
@@ -486,7 +489,7 @@
                 const tglIni = getTodayDateStr();
                 const namaUser = appState.user.namaLengkap;
 
-                // 1. Ticker Event (Get latest 3 events)
+                // 1. Ticker Event
                 const { data: eventsData } = await supabaseClient.from('data_event').select('nama_event, tanggal_pelaksanaan').order('tanggal_pelaksanaan', { ascending: false }).limit(3);
                 const tickerWrap = document.getElementById('ui-ticker-content');
                 if(eventsData && eventsData.length > 0) {
@@ -547,17 +550,24 @@
                     infalContainer.innerHTML = `<div class="bg-slate-50 border border-slate-100 p-4 rounded-xl text-center flex flex-col items-center justify-center min-h-[90px]"><i class="fa-solid fa-mug-hot text-xl text-slate-300 mb-1"></i><p class="text-xs text-slate-500 font-medium">Aman, tidak ada tugas infal.</p></div>`;
                 }
 
-                // 4. Persentase Kehadiran
-                // Simplified Logic: Get all attendance for the user this month.
+                // 4. Persentase Kehadiran (Dengan Toleransi Pengaturan)
                 const startOfMonth = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-01`;
                 const { data: hadirData } = await supabaseClient.from('absensi_gerbang')
-                    .select('waktu_scan').eq('nama_guru', namaUser).gte('tanggal', startOfMonth);
+                    .select('waktu_scan, tanggal').eq('nama_guru', namaUser).gte('tanggal', startOfMonth);
+                
+                // Fetch Pengaturan Gate (Default: 07:00:00)
+                const { data: pengData } = await supabaseClient.from('pengaturan')
+                    .select('nilai').eq('tipe', 'Reguler').eq('nama_pengaturan', 'Jam Masuk Gerbang').limit(1).single();
+                let batasMasukStr = pengData && pengData.nilai ? pengData.nilai : '07:00:00';
+                
+                // Tambah toleransi 5 menit agar tidak langsung telat
+                let batasToleransi = adjustTimeStr(batasMasukStr, 5);
 
                 const hadirContainer = document.getElementById('ui-kehadiran-container');
                 if(hadirData) {
                     let total = hadirData.length;
                     let tepatWaktu = 0;
-                    hadirData.forEach(h => { if(h.waktu_scan <= '07:00:00') tepatWaktu++; });
+                    hadirData.forEach(h => { if(h.waktu_scan <= batasToleransi) tepatWaktu++; });
                     let telat = total - tepatWaktu;
                     let pct = total > 0 ? Math.round((tepatWaktu / total) * 100) : 0;
                     
@@ -580,7 +590,6 @@
                         </div>
                     `;
                 }
-
             } catch(e) {
                 console.error("Dashboard Error:", e);
                 document.getElementById('ui-jadwal-container').innerHTML = `<p class="text-sm text-rose-500 font-medium">Gagal memuat data.</p>`;
@@ -594,7 +603,6 @@
                 let finalComms = [];
 
                 // --- EVENTS LOGIC ---
-                // 1. As Ketua
                 const { data: eventKetua } = await supabaseClient.from('data_event').select('*').eq('pic_guru', namaUser);
                 if(eventKetua && eventKetua.length > 0) {
                     for(let ev of eventKetua) {
@@ -604,7 +612,6 @@
                     }
                 }
                 
-                // 2. As Member
                 const { data: eventMember } = await supabaseClient.from('event_kepanitiaan').select('*').eq('nama_guru_member', namaUser);
                 if(eventMember && eventMember.length > 0) {
                     for(let em of eventMember) {
@@ -614,12 +621,10 @@
                 }
 
                 // --- COMMISSIONS LOGIC ---
-                // 1. As Ketua Komisi
                 const { data: commKetua } = await supabaseClient.from('data_commission').select('*').eq('pic_guru', namaUser);
                 if(commKetua && commKetua.length > 0) {
                     for(let cm of commKetua) {
                         const { data: programs } = await supabaseClient.from('commission_program').select('*').eq('tipe_komisi', cm.tipe_komisi);
-                        // Ambil semua progress yang terkait dengan program di komisi ini (Simplified)
                         let allProgHistory = [];
                         if(programs && programs.length > 0){
                             const pNames = programs.map(p => p.nama_program);
@@ -630,7 +635,6 @@
                     }
                 }
 
-                // 2. As PIC Program
                 const { data: commPic } = await supabaseClient.from('commission_program').select('*').eq('pic_guru', namaUser);
                 if(commPic && commPic.length > 0) {
                     for(let cp of commPic) {
@@ -644,10 +648,11 @@
                 renderCommissionView();
             } catch(e) {
                 console.error("Multi-Role Error:", e);
-                showToast("Gagal menarik data jabatan. Koneksi bermasalah.", "error");
+                showToast("Gagal menarik data jabatan.", "error");
             }
         }
 
+        // Helper Functions UI
         function handleLogout() {
             appState.user = null;
             document.getElementById('view-app').classList.add('hidden-view');
@@ -675,19 +680,13 @@
             activeNav.classList.remove('text-slate-500');
             activeNav.classList.add('bg-awBlueLight', 'text-awBlue');
             const activeIconBox = activeNav.querySelector('div');
-            if(activeIconBox) {
-                activeIconBox.classList.remove('text-slate-400');
-                activeIconBox.classList.add('bg-white', 'text-awBlue', 'shadow-sm');
-            }
+            if(activeIconBox) activeIconBox.classList.add('bg-white', 'text-awBlue', 'shadow-sm');
             
             const titles = { 'dashboard': 'Dashboard Overview', 'event': 'Event & Kepanitiaan', 'commission': 'Manajemen Komisi', 'eis': 'EIS System', 'scanner': 'Web Scanner', 'report': 'Report Tools' };
             document.getElementById('topbar-title').innerText = titles[tabId] || 'Portal Guru';
 
             if (tabId !== 'scanner' && isScannerRunning) stopScanner();
-            if(window.innerWidth < 768) {
-                document.getElementById('sidebar').classList.add('-translate-x-full');
-                document.getElementById('sidebar-overlay').classList.add('hidden');
-            }
+            if(window.innerWidth < 768) toggleSidebar();
         }
 
         function toggleSidebar() {
@@ -701,24 +700,16 @@
             toast.className = `toast ${type}`;
             const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-triangle-exclamation' : 'fa-circle-info';
             toast.innerHTML = `<i class="fa-solid ${icon} text-lg shrink-0"></i> <span class="font-medium leading-tight">${message}</span>`;
-            
             container.appendChild(toast);
             void toast.offsetWidth; 
             toast.classList.add('show');
             setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 3500);
         }
 
-        function getTeacherDropdownOptions() {
-            let opts = `<option value="">Pilih Guru...</option>`;
-            appState.teacherList.forEach(t => { opts += `<option value="${t}">${t}</option>`; });
-            return opts;
-        }
-
         function closeModal(id) {
             const modal = document.getElementById(id);
             modal.classList.add('opacity-0');
             modal.querySelector('div').classList.add('scale-90');
-            modal.querySelector('div').classList.remove('scale-100');
             setTimeout(() => modal.classList.add('hidden'), 300);
         }
 
@@ -840,7 +831,7 @@
                                             <p class="text-[10px] font-bold text-slate-500 mb-1.5 uppercase">Upload Bukti</p>
                                             <div class="flex gap-2">
                                                 <input type="file" id="${fileInputId}" class="flex-1 text-[10px] sm:text-xs border border-slate-200 rounded-lg p-1.5 bg-white file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-[10px] file:font-semibold file:bg-awBlueLight file:text-awBlue hover:file:bg-blue-100 cursor-pointer" accept="image/*,.pdf">
-                                                <button id="btn-up-ap-${idx}-${tIdx}" onclick="uploadActionPlanProof(this, '${task.id}', '${fileInputId}')" class="bg-awBlue text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-blue-800 transition-colors min-w-[70px]">Upload</button>
+                                                <button onclick="uploadActionPlanProof(this, '${ev.title}', '${ev.divisi}', '${task.rencana_tugas}', '${fileInputId}')" class="bg-awBlue text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-blue-800 transition-colors min-w-[70px]">Upload</button>
                                             </div>
                                         </div>
                                     ` : `
@@ -883,7 +874,7 @@
                         cm.programs.forEach(p => {
                             let progHistory = (cm.allHistory || []).filter(h => h.nama_program === p.nama_program);
                             let filesCount = progHistory.length;
-                            let pct = Math.min(100, Math.round((filesCount / 3) * 100)); // 3 files = 100% in UI
+                            let pct = Math.min(100, Math.round((filesCount / 3) * 100));
                             let isUnlocked = filesCount >= 6;
                             let encodedHist = encodeURIComponent(JSON.stringify(progHistory));
                             
@@ -966,7 +957,7 @@
                                         <form onsubmit="submitNewCommProgress(event, '${cm.program}', ${idx})">
                                             <div class="mb-4">
                                                 <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 mb-1.5 uppercase">Keterangan</label>
-                                                <input type="text" id="inp-comm-ket-${idx}" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-blue-500" placeholder="Cth: Pekan 1" required>
+                                                <input type="text" id="inp-comm-ket-${idx}" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-blue-500" placeholder="Cth: Laporan Pekan 1" required>
                                             </div>
                                             <div class="mb-6">
                                                 <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 mb-1.5 uppercase">Lampiran (Foto/PDF)</label>
@@ -988,43 +979,35 @@
             container.innerHTML = html;
         }
 
+        // Helper Forms
+        function getTeacherDropdownOptions() {
+            let opts = `<option value="">Pilih Guru...</option>`;
+            appState.teacherList.forEach(t => { opts += `<option value="${t}">${t}</option>`; });
+            return opts;
+        }
+
         function getActionPlanRowHTML() { 
             return `<div class="flex flex-col sm:flex-row gap-2 ap-row items-start sm:items-center bg-white p-2 sm:p-3 rounded-xl border border-slate-200"><input type="text" class="ap-task w-full border border-slate-200 rounded-lg p-2 text-xs font-medium" placeholder="Rencana tugas..." required><input type="date" class="ap-date w-full sm:w-auto border border-slate-200 rounded-lg p-2 text-xs font-medium text-slate-600" required><button type="button" onclick="this.closest('.ap-row').remove()" class="w-full sm:w-8 h-8 bg-slate-50 border border-slate-200 text-slate-400 hover:text-red-500 rounded-lg"><i class="fa-solid fa-trash text-xs"></i></button></div>`; 
         }
         
         function getCommitteeRowHTML() { 
-            const opts = getTeacherDropdownOptions();
-            return `<div class="flex flex-col sm:flex-row gap-2 comm-row items-start sm:items-center bg-white p-2 sm:p-3 rounded-xl border border-slate-200"><input type="text" class="comm-div w-full sm:w-1/3 border border-slate-200 rounded-lg p-2 text-xs font-medium" placeholder="Nama Divisi" required><select class="comm-guru w-full border border-slate-200 rounded-lg p-2 text-xs font-medium text-slate-700 bg-white" required>${opts}</select><button type="button" onclick="this.closest('.comm-row').remove()" class="w-full sm:w-8 h-8 bg-slate-50 border border-slate-200 text-slate-400 hover:text-red-500 rounded-lg"><i class="fa-solid fa-trash text-xs"></i></button></div>`; 
+            return `<div class="flex flex-col sm:flex-row gap-2 comm-row items-start sm:items-center bg-white p-2 sm:p-3 rounded-xl border border-slate-200"><input type="text" class="comm-div w-full sm:w-1/3 border border-slate-200 rounded-lg p-2 text-xs font-medium" placeholder="Nama Divisi" required><select class="comm-guru w-full border border-slate-200 rounded-lg p-2 text-xs font-medium text-slate-700 bg-white" required>${getTeacherDropdownOptions()}</select><button type="button" onclick="this.closest('.comm-row').remove()" class="w-full sm:w-8 h-8 bg-slate-50 border border-slate-200 text-slate-400 hover:text-red-500 rounded-lg"><i class="fa-solid fa-trash text-xs"></i></button></div>`; 
         }
 
         function getProgramRowHTML() { 
-            const opts = getTeacherDropdownOptions();
-            return `<div class="flex flex-col sm:flex-row gap-2 comm-prog-row items-start sm:items-center bg-white p-2 sm:p-3 rounded-xl border border-slate-200"><input type="text" class="prog-name w-full sm:w-1/2 border border-slate-200 rounded-lg p-2 text-xs font-medium" placeholder="Nama Program" required><select class="prog-pic w-full border border-slate-200 rounded-lg p-2 text-xs font-medium text-slate-700 bg-white" required>${opts}</select><button type="button" onclick="this.closest('.comm-prog-row').remove()" class="w-full sm:w-8 h-8 bg-slate-50 border border-slate-200 text-slate-400 hover:text-red-500 rounded-lg"><i class="fa-solid fa-trash text-xs"></i></button></div>`; 
+            return `<div class="flex flex-col sm:flex-row gap-2 comm-prog-row items-start sm:items-center bg-white p-2 sm:p-3 rounded-xl border border-slate-200"><input type="text" class="prog-name w-full sm:w-1/2 border border-slate-200 rounded-lg p-2 text-xs font-medium" placeholder="Nama Program" required><select class="prog-pic w-full border border-slate-200 rounded-lg p-2 text-xs font-medium text-slate-700 bg-white" required>${getTeacherDropdownOptions()}</select><button type="button" onclick="this.closest('.comm-prog-row').remove()" class="w-full sm:w-8 h-8 bg-slate-50 border border-slate-200 text-slate-400 hover:text-red-500 rounded-lg"><i class="fa-solid fa-trash text-xs"></i></button></div>`; 
         }
 
-        window.tambahBarisPanitia = function(idx) {
-            const container = document.getElementById(`committee-rows-container-${idx}`);
-            if(container) container.insertAdjacentHTML('beforeend', getCommitteeRowHTML());
-        }
-
-        window.tambahBarisProgram = function(idx) {
-            const container = document.getElementById(`program-rows-container-${idx}`);
-            if(container) container.insertAdjacentHTML('beforeend', getProgramRowHTML());
-        }
-
-        window.tambahBarisActionPlan = function(idx) {
-            const container = document.getElementById(`actionplan-rows-container-${idx}`);
-            if(container) container.insertAdjacentHTML('beforeend', getActionPlanRowHTML());
-        }
+        window.tambahBarisPanitia = function(idx) { document.getElementById(`committee-rows-container-${idx}`).insertAdjacentHTML('beforeend', getCommitteeRowHTML()); }
+        window.tambahBarisProgram = function(idx) { document.getElementById(`program-rows-container-${idx}`).insertAdjacentHTML('beforeend', getProgramRowHTML()); }
+        window.tambahBarisActionPlan = function(idx) { document.getElementById(`actionplan-rows-container-${idx}`).insertAdjacentHTML('beforeend', getActionPlanRowHTML()); }
 
         window.showDivisiDetail = function(divName, encodedTasks) {
             const tasks = JSON.parse(decodeURIComponent(encodedTasks));
             const content = document.getElementById('modal-content');
             document.getElementById('modal-title').innerText = `Detail Divisi ${divName}`;
-            
             let html = '<div class="space-y-3">';
             if(tasks.length === 0) html += '<p class="text-sm text-slate-500 italic">Belum ada tugas disubmit.</p>';
-            
             tasks.forEach(t => {
                 let isDone = t.status === 'Selesai';
                 html += `
@@ -1045,10 +1028,8 @@
             const hist = JSON.parse(decodeURIComponent(encodedHist));
             const content = document.getElementById('modal-content');
             document.getElementById('modal-title').innerHTML = `Detail Program<br><span class="text-sm font-medium text-slate-500">${progName} - PIC: ${picName}</span>`;
-            
             let html = '<div class="space-y-3">';
             if(hist.length === 0) html += '<p class="text-sm text-slate-500 italic">Belum ada laporan disetor.</p>';
-            
             hist.forEach(h => {
                 let tgl = new Date(h.created_at).toLocaleDateString();
                 html += `
@@ -1065,80 +1046,45 @@
             openModal('detail-modal');
         }
 
-        window.triggerScoreEvent = function(eventName, divName) {
-            alert(`Fitur Penilaian Divisi ${divName} (Event: ${eventName}) akan segera diintegrasikan.`);
-        }
-
-        window.triggerScoreComm = function(commName, progName, picName) {
-            alert(`Fitur Penilaian PIC ${picName} (Program: ${progName}) unlocked!`);
-        }
+        window.triggerScoreEvent = function(eventName, divName) { alert(`Form Penilaian Divisi ${divName} (Event: ${eventName}) akan segera dibuka.`); }
+        window.triggerScoreComm = function(commName, progName, picName) { alert(`Form Penilaian PIC ${picName} (Program: ${progName}) unlocked!`); }
 
         async function submitCommittee(e, namaEvent, idx) { 
             e.preventDefault(); 
             const form = e.target;
             const btn = document.getElementById(`btn-submit-committee-${idx}`);
-            btn.innerHTML = `<div class="loader-spin"></div> <span>Menyimpan...</span>`;
-            btn.disabled = true;
+            btn.innerHTML = `<div class="loader-spin"></div>`; btn.disabled = true;
 
-            const rows = form.querySelectorAll('.comm-row');
             let insertData = [];
-            rows.forEach(row => {
-                insertData.push({ 
-                    nama_event: namaEvent,
-                    divisi: row.querySelector('.comm-div').value, 
-                    nama_guru_member: row.querySelector('.comm-guru').value 
-                });
+            form.querySelectorAll('.comm-row').forEach(row => {
+                insertData.push({ nama_event: namaEvent, divisi: row.querySelector('.comm-div').value, nama_guru_member: row.querySelector('.comm-guru').value });
             });
-            
             const { error } = await supabaseClient.from('event_kepanitiaan').insert(insertData);
-
-            if(!error) {
-                showToast("Panitia berhasil disimpan!", 'success');
-                form.reset();
-                document.getElementById(`event-form-area-${idx}`).classList.add('hidden');
-                loadTeacherRoles(); 
-            } else {
-                showToast("Gagal menyimpan panitia.", 'error');
-            }
+            if(!error) { showToast("Panitia berhasil disimpan!", 'success'); loadTeacherRoles(); } 
+            else showToast("Gagal menyimpan panitia.", 'error');
             
-            btn.innerHTML = `<span>Simpan Panitia</span>`;
-            btn.disabled = false;
+            btn.innerHTML = `<span>Simpan Panitia</span>`; btn.disabled = false;
         }
 
         async function submitNewActionPlan(e, namaEvent, divisi, idx) {
             e.preventDefault();
             const form = e.target;
             const btn = document.getElementById(`btn-submit-actionplan-${idx}`);
-            btn.innerHTML = `<div class="loader-spin"></div> <span>Mengirim...</span>`;
-            btn.disabled = true;
+            btn.innerHTML = `<div class="loader-spin"></div>`; btn.disabled = true;
 
-            const rows = form.querySelectorAll('.ap-row');
             let insertData = [];
-            
-            rows.forEach(row => {
-                insertData.push({ 
-                    nama_event: namaEvent, 
-                    divisi: divisi, 
-                    rencana_tugas: row.querySelector('.ap-task').value, 
-                    deadline: row.querySelector('.ap-date').value,
-                    status: 'Pending'
-                });
+            form.querySelectorAll('.ap-row').forEach(row => {
+                insertData.push({ nama_event: namaEvent, divisi: divisi, rencana_tugas: row.querySelector('.ap-task').value, deadline: row.querySelector('.ap-date').value, status: 'Pending' });
             });
-
             const { error } = await supabaseClient.from('event_action_plan').insert(insertData);
-
-            if (!error) {
-                showToast('Action Plan berhasil disimpan!', 'success');
-                loadTeacherRoles(); 
-            } else {
-                showToast('Gagal menyimpan Action Plan', 'error');
-            }
+            if (!error) { showToast('Action Plan berhasil disimpan!', 'success'); loadTeacherRoles(); } 
+            else showToast('Gagal menyimpan Action Plan', 'error');
             
-            btn.innerHTML = `<span>Kirim Tugas</span>`;
-            btn.disabled = false;
+            btn.innerHTML = `<span>Kirim Tugas</span>`; btn.disabled = false;
         }
 
-        async function uploadActionPlanProof(btnEl, taskId, inputId) {
+        // Perbaikan Upload Event (Rencana Tugas & Public Bucket)
+        async function uploadActionPlanProof(btnEl, eventName, divisi, rencanaTugas, inputId) {
             const fileInput = document.getElementById(inputId);
             if (!fileInput.files || fileInput.files.length === 0) { showToast('Pilih file bukti terlebih dahulu!', 'error'); return; }
             
@@ -1148,28 +1094,25 @@
             btnEl.disabled = true; fileInput.disabled = true;
 
             try {
-                // 1. Upload to Supabase Storage
                 const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
                 const { error: uploadError } = await supabaseClient.storage.from(STORAGE_BUCKET).upload(`events/${fileName}`, file);
-                
                 if (uploadError) throw uploadError;
 
-                // 2. Get Public URL
                 const { data: publicUrlData } = supabaseClient.storage.from(STORAGE_BUCKET).getPublicUrl(`events/${fileName}`);
                 const fileUrl = publicUrlData.publicUrl;
 
-                // 3. Update event_action_plan
                 const { error: updateError } = await supabaseClient.from('event_action_plan')
                     .update({ status: 'Selesai', link_bukti: fileUrl })
-                    .eq('id', taskId);
-
+                    .eq('nama_event', eventName)
+                    .eq('divisi', divisi)
+                    .eq('rencana_tugas', rencanaTugas);
                 if (updateError) throw updateError;
 
                 showToast('Bukti diupload! Tugas selesai.', 'success');
                 loadTeacherRoles();
             } catch (error) {
                 console.error(error);
-                showToast('Gagal memproses file.', 'error');
+                showToast('Gagal memproses file. Pastikan policy bucket Public.', 'error');
                 btnEl.innerHTML = originalContent; btnEl.disabled = false; fileInput.disabled = false;
             }
         }
@@ -1178,35 +1121,20 @@
             e.preventDefault(); 
             const form = e.target;
             const btn = document.getElementById(`btn-submit-program-${idx}`);
-            btn.innerHTML = `<div class="loader-spin"></div> <span>Menyimpan...</span>`;
-            btn.disabled = true;
+            btn.innerHTML = `<div class="loader-spin"></div>`; btn.disabled = true;
 
-            const rows = form.querySelectorAll('.comm-prog-row');
             let insertData = [];
-            rows.forEach(row => {
-                insertData.push({ 
-                    tipe_komisi: tipeKomisi,
-                    nama_program: row.querySelector('.prog-name').value, 
-                    pic_guru: row.querySelector('.prog-pic').value,
-                    status_aktif: 'TRUE'
-                });
+            form.querySelectorAll('.comm-prog-row').forEach(row => {
+                insertData.push({ tipe_komisi: tipeKomisi, nama_program: row.querySelector('.prog-name').value, pic_guru: row.querySelector('.prog-pic').value, status_aktif: 'TRUE' });
             });
-            
             const { error } = await supabaseClient.from('commission_program').insert(insertData);
-
-            if(!error) {
-                showToast("Program berhasil disimpan!", 'success');
-                form.reset();
-                document.getElementById(`comm-form-area-${idx}`).classList.add('hidden');
-                loadTeacherRoles(); 
-            } else {
-                showToast("Gagal menyimpan program.", 'error');
-            }
+            if(!error) { showToast("Program berhasil disimpan!", 'success'); loadTeacherRoles(); } 
+            else showToast("Gagal menyimpan program.", 'error');
             
-            btn.innerHTML = `<span>Simpan Program</span>`;
-            btn.disabled = false;
+            btn.innerHTML = `<span>Simpan Program</span>`; btn.disabled = false;
         }
 
+        // Perbaikan Upload Komisi (keterangan & Public Bucket)
         async function submitNewCommProgress(e, programName, idx) {
             e.preventDefault();
             const fileInput = document.getElementById(`comm-file-upload-${idx}`);
@@ -1215,29 +1143,22 @@
             if (!fileInput.files || fileInput.files.length === 0) { showToast('Harap pilih file lampiran!', 'error'); return; }
 
             const btn = document.getElementById(`btn-submit-comm-prog-${idx}`);
-            btn.innerHTML = `<div class="loader-spin"></div> <span>Mengupload...</span>`;
-            btn.disabled = true;
+            btn.innerHTML = `<div class="loader-spin"></div>`; btn.disabled = true;
 
             try {
                 const file = fileInput.files[0];
                 const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
-                
-                // 1. Upload to Storage
                 const { error: uploadError } = await supabaseClient.storage.from(STORAGE_BUCKET).upload(`commissions/${fileName}`, file);
                 if (uploadError) throw uploadError;
 
-                // 2. Get Public URL
                 const { data: publicUrlData } = supabaseClient.storage.from(STORAGE_BUCKET).getPublicUrl(`commissions/${fileName}`);
-                const fileUrl = publicUrlData.publicUrl;
-
-                // 3. Insert Log
+                
                 const { error: insertError } = await supabaseClient.from('commission_progress').insert([{
                     nama_program: programName,
                     pic_guru: appState.user.namaLengkap,
                     keterangan: ketInput,
-                    link_file_foto: fileUrl
+                    link_file_foto: publicUrlData.publicUrl
                 }]);
-
                 if (insertError) throw insertError;
 
                 showToast('Laporan berhasil ditambahkan!', 'success');
@@ -1267,7 +1188,7 @@
         }
 
         function toggleCamera() {
-            if (isScannerRunning) { stopScanner().then(() => updateBtnUI(false)); } 
+            if (isScannerRunning) stopScanner().then(() => updateBtnUI(false));
             else { startScanner(); updateBtnUI(true); }
         }
 
@@ -1289,79 +1210,116 @@
                 startScanner();
             } else {
                 currentFacingMode = currentFacingMode === "environment" ? "user" : "environment";
-                showToast("Mode kamera diubah. Nyalakan kamera.", "info");
             }
         }
 
         function startScanner() {
             if(!html5QrCode) html5QrCode = new Html5Qrcode("reader");
             let boxSize = Math.min(window.innerWidth * 0.7, 300);
-            const config = { fps: 10, qrbox: { width: boxSize, height: boxSize } };
-            
-            html5QrCode.start({ facingMode: currentFacingMode }, config, onScanSuccess)
-            .then(() => {
-                isScannerRunning = true;
-                document.getElementById('scan-laser-decor').classList.remove('hidden');
-            })
-            .catch(err => { showToast("Gagal mengakses kamera browser.", "error"); updateBtnUI(false); });
+            html5QrCode.start({ facingMode: currentFacingMode }, { fps: 10, qrbox: { width: boxSize, height: boxSize } }, onScanSuccess)
+            .then(() => { isScannerRunning = true; document.getElementById('scan-laser-decor').classList.remove('hidden'); })
+            .catch(err => { showToast("Kamera diblokir/tidak ditemukan.", "error"); updateBtnUI(false); });
         }
 
         function stopScanner() {
             return new Promise((resolve) => {
                 if(html5QrCode && isScannerRunning) {
-                    html5QrCode.stop().then(() => {
-                        isScannerRunning = false;
-                        document.getElementById('scan-laser-decor').classList.add('hidden');
-                        resolve();
-                    }).catch(err => { resolve(); });
+                    html5QrCode.stop().then(() => { isScannerRunning = false; document.getElementById('scan-laser-decor').classList.add('hidden'); resolve(); }).catch(e => resolve());
                 } else resolve();
             });
         }
 
+        // INI DIA: SMART VALIDATION V4.0 (JP Berbasis Waktu & Nama Kelas)
         async function onScanSuccess(decodedText, decodedResult) {
             await stopScanner();
             updateBtnUI(false);
-            
             document.getElementById('scan-loading-overlay').classList.remove('hidden');
+            
             const qrCodeClass = decodedText.trim();
             const tglIni = getTodayDateStr();
             const jamIni = getCurrentTimeStr();
+            const hariIni = getHariIniStr();
             const namaUser = appState.user.namaLengkap;
 
             try {
-                if (appState.scanMode === 'in') {
-                    // Cek apakah sudah Check In
-                    const { data: cekData } = await supabaseClient.from('log_cico').select('id')
-                        .eq('tanggal', tglIni).eq('nama_guru', namaUser).eq('id_kelas', qrCodeClass).single();
+                // 1. Translasi ID Kelas ("CLS-29" -> "11 DI")
+                const { data: classData } = await supabaseClient.from('master_kelas').select('kelas').eq('id_kelas', qrCodeClass).single();
+                if(!classData) {
+                    showScanModal({ status: 'error', message: `QR Code tidak dikenali oleh sistem.`});
+                    document.getElementById('scan-loading-overlay').classList.add('hidden'); return;
+                }
+                const namaKelasAsli = classData.kelas;
+
+                // 2. Tentukan Sesi JP Saat Ini (Berdasarkan Tabel Pengaturan)
+                const { data: jpData } = await supabaseClient.from('pengaturan')
+                    .select('nama_pengaturan, nilai')
+                    .eq('hari', hariIni).eq('tipe', 'Reguler').like('nama_pengaturan', 'JP %')
+                    .order('nilai');
+                
+                let activeJP = null;
+                if(jpData) {
+                    for(let i=0; i < jpData.length; i++) {
+                        let waktuMulai = jpData[i].nilai;
+                        // Toleransi: Mulai 15 Menit Sebelum JP, Berakhir 60 Menit Setelahnya
+                        let toleransiAwal = adjustTimeStr(waktuMulai, -15);
+                        let toleransiAkhir = adjustTimeStr(waktuMulai, 60); 
                         
-                    if (cekData) {
-                        showScanModal({ status: 'error', message: `Anda sudah Check-In di kelas ${qrCodeClass} hari ini.`});
+                        if(jamIni >= toleransiAwal && jamIni <= toleransiAkhir) {
+                            activeJP = jpData[i].nama_pengaturan;
+                            break;
+                        }
+                    }
+                }
+
+                if(!activeJP) {
+                    showScanModal({ status: 'error', message: `Tidak ada sesi JP aktif pada jam ${jamIni}. Cek kembali jadwal.`});
+                    document.getElementById('scan-loading-overlay').classList.add('hidden'); return;
+                }
+
+                // 3. Validasi Silang Jadwal (Reguler / Infal)
+                const { data: jadData } = await supabaseClient.from('master_jadwal').select('id')
+                    .eq('guru', namaUser).eq('kelas', namaKelasAsli).eq('hari', hariIni).eq('sesi_jp', activeJP).single();
+                
+                let isAuthorized = !!jadData;
+
+                if(!isAuthorized) { // Cek Infal
+                    const { data: infData } = await supabaseClient.from('data_infal').select('id')
+                        .eq('guru_pengganti', namaUser).eq('id_kelas', namaKelasAsli).eq('tanggal', tglIni).eq('sesi_jp', activeJP).single();
+                    if(infData) isAuthorized = true;
+                }
+
+                if(!isAuthorized) {
+                    showScanModal({ status: 'error', message: `Anda tidak ada jadwal di kelas ${namaKelasAsli} pada ${activeJP}.`});
+                    document.getElementById('scan-loading-overlay').classList.add('hidden'); return;
+                }
+
+                // 4. Pencatatan Check-In / Check-Out
+                const { data: existLog } = await supabaseClient.from('log_cico').select('id, waktu_out')
+                    .eq('tanggal', tglIni).eq('nama_guru', namaUser).eq('id_kelas', qrCodeClass).eq('sesi_jp', activeJP).single();
+
+                if (appState.scanMode === 'in') {
+                    if (existLog) {
+                        showScanModal({ status: 'error', message: `Anda sudah Check-In di kelas ${namaKelasAsli} pada ${activeJP} hari ini.`});
                     } else {
-                        // INSERT NEW LOG
                         const { error } = await supabaseClient.from('log_cico').insert([{
-                            tanggal: tglIni,
-                            nama_guru: namaUser,
-                            id_kelas: qrCodeClass,
-                            waktu_in: jamIni
+                            tanggal: tglIni, nama_guru: namaUser, id_kelas: qrCodeClass, sesi_jp: activeJP, waktu_in: jamIni
                         }]);
                         if(error) throw error;
-                        showScanModal({ status: 'success', message: `Berhasil masuk ke kelas ${qrCodeClass}.`, waktu: jamIni });
+                        showScanModal({ status: 'success', message: `Berhasil masuk ke ${namaKelasAsli} (${activeJP}).`, waktu: jamIni });
                     }
-                } else {
-                    // CHECK OUT (UPDATE LOG)
-                    const { data: existData } = await supabaseClient.from('log_cico').select('id')
-                        .eq('tanggal', tglIni).eq('nama_guru', namaUser).eq('id_kelas', qrCodeClass).single();
-                    
-                    if (!existData) {
-                        showScanModal({ status: 'error', message: `Anda belum Check-In di kelas ${qrCodeClass} hari ini.`});
+                } else { // CHECK OUT
+                    if (!existLog) {
+                        showScanModal({ status: 'error', message: `Anda belum Check-In di ${namaKelasAsli} pada ${activeJP}.`});
+                    } else if (existLog.waktu_out) {
+                        showScanModal({ status: 'error', message: `Anda sudah Check-Out dari ${namaKelasAsli} pada ${activeJP}.`});
                     } else {
-                        const { error } = await supabaseClient.from('log_cico').update({ waktu_out: jamIni }).eq('id', existData.id);
+                        const { error } = await supabaseClient.from('log_cico').update({ waktu_out: jamIni }).eq('id', existLog.id);
                         if(error) throw error;
-                        showScanModal({ status: 'success', message: `Berhasil keluar dari kelas ${qrCodeClass}.`, waktu: jamIni });
+                        showScanModal({ status: 'success', message: `Berhasil keluar dari ${namaKelasAsli} (${activeJP}).`, waktu: jamIni });
                     }
                 }
             } catch(e) {
-                showScanModal({ status: 'error', message: "Gagal memproses data ke database."});
+                showScanModal({ status: 'error', message: "Gagal memproses validasi ke database."});
             }
 
             document.getElementById('scan-loading-overlay').classList.add('hidden');
