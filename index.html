@@ -1,15 +1,16 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Teacher Portal - Al-Wildan Islamic School 15 Bekasi</title>
     
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="icon" type="image/png" href="https://i.ibb.co.com/27J08HWy/favicon.png">
     
     <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Tailwind CSS -->
@@ -27,15 +28,23 @@
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        awBlue: '#0020B2',
-                        awBlueLight: '#e0e7ff',
-                        awGreen: '#00FF00',
-                        awOrange: '#FF6600',
+                        // New Palette matching Student Portal
+                        aw: {
+                            navy: '#1e3a8a', // blue-900
+                            blue: '#2563eb', // blue-600
+                            green: '#10b981', // emerald-500
+                            yellow: '#fbbf24', // amber-400
+                            light: '#f8fafc',
+                        },
+                        awBlue: '#2563eb', /* Backward compatibility for JS */
+                        awBlueLight: '#eff6ff',
+                        awGreen: '#10b981',
+                        awOrange: '#f59e0b',
                         awDark: '#0f172a',
                     },
                     boxShadow: {
                         'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
-                        'glow': '0 0 15px rgba(0, 32, 178, 0.3)',
+                        'glow': '0 0 15px rgba(37, 99, 235, 0.3)',
                     }
                 }
             }
@@ -43,31 +52,57 @@
     </script>
     
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; -webkit-font-smoothing: antialiased; overscroll-behavior-y: none; }
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; overscroll-behavior-y: none; }
         
+        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         .fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .slide-down { animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Background Animated Icons */
+        @keyframes float-slow {
+            0% { transform: translateY(0px) rotate(0deg) scale(1); }
+            50% { transform: translateY(-30px) rotate(5deg) scale(1.05); }
+            100% { transform: translateY(0px) rotate(0deg) scale(1); }
+        }
+        @keyframes float-reverse {
+            0% { transform: translateY(0px) rotate(0deg) scale(1); }
+            50% { transform: translateY(25px) rotate(-5deg) scale(0.95); }
+            100% { transform: translateY(0px) rotate(0deg) scale(1); }
+        }
+        .animate-float-1 { animation: float-slow 15s ease-in-out infinite; }
+        .animate-float-2 { animation: float-reverse 18s ease-in-out infinite; }
+        .animate-float-3 { animation: float-slow 20s ease-in-out infinite; animation-delay: 2s; }
+        .animate-float-4 { animation: float-reverse 22s ease-in-out infinite; animation-delay: 1s; }
 
-        .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.5); }
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85); 
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+            border-radius: 1.5rem; 
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover { box-shadow: 0 15px 35px -5px rgba(0,0,0,0.08); transform: translateY(-2px); }
 
         .ticker-wrap { width: 100%; overflow: hidden; white-space: nowrap; position: relative; }
         .ticker-move { display: inline-flex; white-space: nowrap; padding-right: 100%; animation: ticker 25s linear infinite; }
         .ticker-move:hover { animation-play-state: paused; }
         @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
 
-        /* Sci-Fi Scanner UI */
+        /* Sci-Fi Scanner UI adapted to new theme */
         .scanner-container {
             position: relative; overflow: hidden; border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0, 255, 0, 0.1);
-            background: #000; min-height: 300px;
+            box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.2);
+            background: #0f172a; min-height: 300px;
         }
         .scanner-corners::before, .scanner-corners::after, .scanner-corners span::before, .scanner-corners span::after {
             content: ''; position: absolute; width: 40px; height: 40px; 
@@ -88,178 +123,200 @@
 
         #reader video { object-fit: cover; border-radius: 16px; }
 
-        .hidden-view { display: none !important; }
-        .bg-grid-pattern { background-image: radial-gradient(rgba(148, 163, 184, 0.15) 1px, transparent 1px); background-size: 24px 24px; }
-        .bg-hero-pattern { background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px); background-size: 20px 20px; }
-
         /* Toast System */
-        #toast-container { position: fixed; bottom: 24px; right: 24px; left: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 12px; pointer-events: none; align-items: center; md:left:auto; md:items-end;}
+        #toast-container { position: fixed; top: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 12px; pointer-events: none; align-items: flex-end; left: 24px; md:left: auto;}
         .toast {
-            min-width: 280px; max-width: 400px; padding: 14px 18px; border-radius: 12px; color: white;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15); font-weight: 500; font-size: 0.875rem;
-            transform: translateY(120%) scale(0.9); opacity: 0;
+            min-width: 280px; max-width: 400px; padding: 14px 18px; border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15); font-weight: 600; font-size: 0.875rem;
+            transform: translateX(120%) scale(0.9); opacity: 0;
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex; align-items: center; gap: 12px; pointer-events: auto;
+            border: 1px solid rgba(255,255,255,0.5);
         }
-        @media (min-width: 768px) { .toast { transform: translateX(120%) scale(0.9); } .toast.show { transform: translateX(0) scale(1); } }
-        .toast.show { transform: translateY(0) scale(1); opacity: 1; }
-        .toast.success { background: linear-gradient(135deg, #10B981, #059669); }
-        .toast.error { background: linear-gradient(135deg, #EF4444, #DC2626); }
-        .toast.info { background: linear-gradient(135deg, #3B82F6, #2563EB); }
+        @media (max-width: 767px) {
+            #toast-container { top: 24px; left: 24px; right: 24px; align-items: center; }
+            .toast { transform: translateY(-120%) scale(0.9); width: 100%; max-width: 100%;}
+            .toast.show { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        .toast.show { transform: translateX(0) scale(1); opacity: 1; }
+        .toast.success { background: rgba(236, 253, 245, 0.95); color: #065f46; border-color: #a7f3d0; backdrop-filter: blur(8px); }
+        .toast.error { background: rgba(254, 242, 242, 0.95); color: #991b1b; border-color: #fecaca; backdrop-filter: blur(8px); }
+        .toast.info { background: rgba(239, 246, 255, 0.95); color: #1e40af; border-color: #bfdbfe; backdrop-filter: blur(8px); }
+        
         .loader-spin { border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="text-slate-800 h-screen flex overflow-hidden bg-grid-pattern">
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-slate-800 h-screen w-screen overflow-hidden relative selection:bg-amber-200 selection:text-blue-900">
+
+    <div id="animated-background" class="fixed inset-0 pointer-events-none z-0 overflow-hidden flex items-center justify-center opacity-40">
+        <div class="absolute top-[10%] left-[5%] text-aw-blue opacity-20 animate-float-1"><i class="fa-solid fa-microscope text-[120px]"></i></div>
+        <div class="absolute top-[15%] right-[10%] text-aw-yellow opacity-20 animate-float-2"><i class="fa-solid fa-atom text-[100px]"></i></div>
+        <div class="absolute bottom-[10%] left-[10%] text-aw-green opacity-20 animate-float-3"><i class="fa-solid fa-book-open text-[140px]"></i></div>
+        <div class="absolute bottom-[15%] right-[5%] text-indigo-500 opacity-20 animate-float-4"><i class="fa-solid fa-globe text-[120px]"></i></div>
+        <div class="absolute top-[45%] left-[2%] text-purple-500 opacity-10 animate-float-2"><i class="fa-solid fa-flask text-[90px]"></i></div>
+        <div class="absolute top-[35%] right-[5%] text-rose-500 opacity-10 animate-float-1"><i class="fa-solid fa-laptop-code text-[110px]"></i></div>
+    </div>
 
     <div id="toast-container"></div>
     
     <!-- Modal: Scanner Result -->
-    <div id="scan-modal" class="hidden fixed inset-0 z-[999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-6 opacity-0 transition-opacity duration-300">
-        <div class="bg-white rounded-3xl p-8 w-full max-w-sm shadow-2xl transform scale-90 transition-transform duration-300 flex flex-col items-center text-center relative overflow-hidden"> 
+    <div id="scan-modal" class="hidden fixed inset-0 z-[999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-3xl p-8 w-full max-w-sm shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col items-center text-center relative overflow-hidden border border-slate-100"> 
              <div id="scan-modal-content" class="w-full"></div>
              <button onclick="closeModal('scan-modal')" class="w-full mt-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-all shadow-sm">Tutup & Lanjut</button>
         </div>
     </div>
 
     <!-- Modal: Global Detail & Scoring -->
-    <div id="detail-modal" class="hidden fixed inset-0 z-[999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 sm:p-6 opacity-0 transition-opacity duration-300">
-        <div class="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] shadow-2xl transform scale-90 transition-transform duration-300 flex flex-col relative overflow-hidden">
-            <div class="flex justify-between items-center p-6 border-b border-slate-100 bg-slate-50">
-                <h3 id="modal-title" class="font-extrabold text-slate-800 text-xl">Detail Progress</h3>
-                <button onclick="closeModal('detail-modal')" class="w-8 h-8 flex items-center justify-center bg-white rounded-full text-slate-400 hover:text-red-500 shadow-sm"><i class="fa-solid fa-times"></i></button>
+    <div id="detail-modal" class="hidden fixed inset-0 z-[999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-3xl w-full max-w-lg max-h-[85vh] shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col relative overflow-hidden border border-slate-100">
+            <div class="flex justify-between items-center p-6 border-b border-slate-100 bg-slate-50/50">
+                <h3 id="modal-title" class="font-black text-slate-800 text-xl">Detail Progress</h3>
+                <button onclick="closeModal('detail-modal')" class="w-8 h-8 flex items-center justify-center bg-white rounded-full text-slate-400 hover:text-red-500 shadow-sm border border-slate-200 transition-colors"><i class="fa-solid fa-times"></i></button>
             </div>
-            <div id="modal-content" class="p-6 overflow-y-auto flex-1"></div>
+            <div id="modal-content" class="p-6 overflow-y-auto flex-1 custom-scrollbar"></div>
         </div>
     </div>
 
-    <div id="view-login" class="w-full h-full flex flex-col md:flex-row bg-white absolute z-50 inset-0 transition-opacity duration-700">
-        <div class="hidden md:flex w-1/2 bg-gradient-to-br from-awBlue to-indigo-900 flex-col justify-center items-center p-12 relative overflow-hidden">
-            <div class="absolute inset-0 bg-hero-pattern opacity-30"></div>
-            <div class="absolute -top-24 -left-24 w-96 h-96 bg-white opacity-5 rounded-full blur-3xl"></div>
-            <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-awGreen opacity-10 rounded-full blur-3xl"></div>
-            <img src="https://i.ibb.co.com/27J08HWy/favicon.png" alt="Logo" class="w-40 h-40 mb-8 z-10 drop-shadow-2xl hover:scale-105 transition-transform duration-500" onerror="this.src='https://placehold.co/160x160/0020B2/FFFFFF?text=AW15'">
-            <h1 class="text-4xl font-extrabold text-white mb-3 z-10 text-center tracking-tight">Teacher Portal</h1>
-            <p class="text-indigo-200 text-lg z-10 text-center font-medium">Al-Wildan Islamic School 15 Bekasi</p>
-        </div>
-        
-        <div class="w-full md:w-1/2 flex justify-center items-center p-6 sm:p-8 bg-slate-50 relative">
-            <div class="w-full max-w-md bg-white rounded-3xl shadow-soft p-8 sm:p-10 border border-slate-100 relative z-10">
-                <div class="md:hidden flex flex-col items-center mb-8"> 
-                     <img src="https://i.ibb.co.com/27J08HWy/favicon.png" alt="Logo" class="w-20 h-20 mb-3 drop-shadow-lg" onerror="this.src='https://placehold.co/80x80/0020B2/FFFFFF?text=AW'">
-                     <h2 class="text-2xl font-bold text-awBlue">Teacher Portal</h2>
+    <div id="view-login" class="fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-700">
+        <div class="glass-card p-8 md:p-12 w-full max-w-md relative z-10 border border-white/80">
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 mx-auto bg-white rounded-full p-2 shadow-md border border-slate-100 mb-4 flex items-center justify-center">
+                    <img src="https://i.ibb.co.com/27J08HWy/favicon.png" alt="Logo" class="w-full h-full object-contain" onerror="this.src='https://placehold.co/100x100/1e3a8a/ffffff?text=AW15'">
                 </div>
-                <div class="mb-8 hidden md:block">
-                    <h2 class="text-3xl font-bold text-slate-800 mb-2">Welcome back</h2>
-                    <p class="text-slate-500 text-sm">Masuk menggunakan kredensial Anda.</p>
-                </div>
-                <form id="login-form" onsubmit="handleLogin(event)">
-                    <div class="mb-5">
-                        <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Username</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i class="fa-solid fa-user text-slate-400"></i></div>
-                            <input type="text" id="inp-username" class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-awBlue/50 focus:border-awBlue transition-all font-medium" placeholder="ID Guru..." required>
-                        </div>
-                    </div>
-                    <div class="mb-8">
-                        <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide flex justify-between"><span>Password</span></label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i class="fa-solid fa-lock text-slate-400"></i></div>
-                            <input type="password" id="inp-password" class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-awBlue/50 focus:border-awBlue transition-all font-medium" placeholder="••••••••" required>
-                        </div>
-                    </div>
-                    <button type="submit" id="btn-login" class="w-full bg-awBlue hover:bg-blue-800 text-white font-bold py-3.5 px-4 rounded-xl transition-all duration-300 shadow-[0_4px_14px_rgba(0,32,178,0.3)] hover:shadow-[0_6px_20px_rgba(0,32,178,0.4)] flex justify-center items-center gap-2">
-                        <span>Sign In</span> <i class="fa-solid fa-arrow-right-to-bracket"></i>
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <div id="view-app" class="hidden-view w-full h-full flex relative z-0">
-        <!-- Sidebar -->
-        <aside id="sidebar" class="w-64 bg-white border-r border-slate-100 flex-shrink-0 flex flex-col transition-transform duration-300 z-40 fixed md:relative h-full -translate-x-full md:translate-x-0 shadow-2xl md:shadow-none">
-            <div class="h-20 flex items-center px-6 gap-3 border-b border-slate-50">
-                <img src="https://i.ibb.co.com/27J08HWy/favicon.png" alt="Logo" class="w-10 h-10 rounded-full bg-slate-50 p-1" onerror="this.src='https://placehold.co/40x40/0020B2/FFFFFF?text=AW'">
-                <div><h1 class="font-bold text-awBlue text-lg leading-tight">Portal Guru</h1><p class="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Al-Wildan 15</p></div>
-                <button class="md:hidden ml-auto text-slate-400 hover:text-slate-600 p-2" onclick="toggleSidebar()"><i class="fa-solid fa-times text-xl"></i></button>
+                <h1 class="text-2xl font-black text-aw-navy tracking-tight">Teacher Portal</h1>
+                <p class="text-xs font-bold text-aw-yellow uppercase tracking-widest mt-1">Al Wildan 15 Bekasi</p>
             </div>
             
-            <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2">
-                <p class="px-2 text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">Main Menu</p>
-                <a href="#" onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item group flex items-center gap-3 px-3 py-3 rounded-xl bg-awBlueLight text-awBlue font-semibold transition-all">
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-white shadow-sm text-awBlue group-hover:scale-110 transition-transform"><i class="fa-solid fa-chart-pie"></i></div> Dashboard
-                </a>
-                <a href="#" onclick="switchTab('event')" id="nav-event" class="nav-item group flex items-center gap-3 px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-slate-800 font-medium transition-all">
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 group-hover:text-awBlue group-hover:bg-white group-hover:shadow-sm transition-all"><i class="fa-solid fa-calendar-check"></i></div> Event
-                </a>
-                <a href="#" onclick="switchTab('commission')" id="nav-commission" class="nav-item group flex items-center gap-3 px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-slate-800 font-medium transition-all">
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 group-hover:text-awBlue group-hover:bg-white group-hover:shadow-sm transition-all"><i class="fa-solid fa-users-gear"></i></div> Commission
-                </a>
+            <form id="login-form" class="space-y-5" onsubmit="handleLogin(event)">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-2 pl-1">Username / ID Guru</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-user absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="inp-username" class="w-full pl-11 pr-4 py-3.5 bg-white/70 border border-slate-200 rounded-xl focus:ring-2 focus:ring-aw-blue focus:border-aw-blue outline-none transition font-medium text-slate-700 shadow-inner" placeholder="Masukkan ID..." required>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-2 pl-1">Password</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                        <input type="password" id="inp-password" class="w-full pl-11 pr-4 py-3.5 bg-white/70 border border-slate-200 rounded-xl focus:ring-2 focus:ring-aw-blue focus:border-aw-blue outline-none transition font-medium text-slate-700 shadow-inner" placeholder="••••••••" required>
+                    </div>
+                </div>
+                <button type="submit" id="btn-login" class="w-full py-3.5 bg-aw-navy hover:bg-blue-800 text-white font-bold rounded-xl transition shadow-lg shadow-aw-navy/30 flex items-center justify-center gap-2 mt-4 group">
+                    <span>Masuk Sekarang</span> <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="view-app" class="hidden flex h-full w-full relative z-10 transition-all duration-500 opacity-0">
+        
+        <!-- SIDEBAR (Desktop) -->
+        <aside class="hidden lg:flex flex-col w-64 bg-gradient-to-b from-aw-navy to-blue-950 text-white h-full shrink-0 shadow-2xl relative border-r-4 border-aw-yellow z-30">
+            <div class="p-6 flex items-center gap-3 border-b border-white/10">
+                <img src="https://i.ibb.co.com/27J08HWy/favicon.png" alt="Logo" class="w-10 h-10 bg-white rounded-full p-1 shadow-md" onerror="this.style.display='none'">
+                <div>
+                    <h2 class="font-bold text-white tracking-wide text-sm">Teacher Portal</h2>
+                    <p class="text-[9px] text-aw-yellow font-bold uppercase tracking-widest">Ecosystem App</p>
+                </div>
+            </div>
+            
+            <nav class="flex-1 px-3 py-6 space-y-1.5 overflow-y-auto custom-scrollbar">
+                <p class="px-3 text-[10px] font-bold text-blue-300/70 uppercase tracking-widest mb-2">Main Menu</p>
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-white/10 text-white border-l-4 border-aw-yellow font-bold transition">
+                    <i class="fa-solid fa-chart-pie w-5 text-center"></i> Dashboard
+                </button>
+                <button onclick="switchTab('event')" id="nav-event" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-blue-200 hover:text-white hover:bg-white/5 font-medium transition border-l-4 border-transparent">
+                    <i class="fa-solid fa-calendar-check w-5 text-center"></i> Event
+                </button>
+                <button onclick="switchTab('commission')" id="nav-commission" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-blue-200 hover:text-white hover:bg-white/5 font-medium transition border-l-4 border-transparent">
+                    <i class="fa-solid fa-users-gear w-5 text-center"></i> Commission
+                </button>
                 
-                <div class="my-4 border-t border-slate-100 mx-2"></div>
-                <p class="px-2 text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">External & Tools</p>
-                <a href="#" onclick="switchTab('eis')" id="nav-eis" class="nav-item group flex items-center gap-3 px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-slate-800 font-medium transition-all">
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 group-hover:text-awBlue group-hover:bg-white group-hover:shadow-sm transition-all"><i class="fa-solid fa-globe"></i></div> EIS System
-                </a>
-                <a href="#" onclick="switchTab('scanner')" id="nav-scanner" class="nav-item group flex items-center gap-3 px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-slate-800 font-medium transition-all">
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 group-hover:text-awBlue group-hover:bg-white group-hover:shadow-sm transition-all"><i class="fa-solid fa-qrcode"></i></div> Web Scanner
-                </a>
-                <a href="#" onclick="switchTab('report')" id="nav-report" class="nav-item group flex items-center gap-3 px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-slate-800 font-medium transition-all">
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 group-hover:text-awBlue group-hover:bg-white group-hover:shadow-sm transition-all"><i class="fa-solid fa-pen-to-square"></i></div> Report Tools
-                </a>
+                <p class="px-3 text-[10px] font-bold text-blue-300/70 uppercase tracking-widest mt-6 mb-2">External & Tools</p>
+                <button onclick="switchTab('eis')" id="nav-eis" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-blue-200 hover:text-white hover:bg-white/5 font-medium transition border-l-4 border-transparent">
+                    <i class="fa-solid fa-globe w-5 text-center"></i> EIS System
+                </button>
+                <button onclick="switchTab('scanner')" id="nav-scanner" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-blue-200 hover:text-white hover:bg-white/5 font-medium transition border-l-4 border-transparent">
+                    <i class="fa-solid fa-qrcode w-5 text-center"></i> Web Scanner
+                </button>
+                <button onclick="switchTab('report')" id="nav-report" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-blue-200 hover:text-white hover:bg-white/5 font-medium transition border-l-4 border-transparent">
+                    <i class="fa-solid fa-pen-to-square w-5 text-center"></i> Report Tools
+                </button>
             </nav>
-            <div class="p-4 border-t border-slate-100 bg-slate-50/50">
-                <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors font-semibold text-sm">
+            
+            <div class="p-4 border-t border-white/10">
+                <div class="flex items-center gap-3 mb-4 px-2">
+                    <div id="ui-user-avatar-desk" class="w-9 h-9 rounded-full bg-aw-yellow text-aw-navy flex items-center justify-center font-bold text-sm shadow-md">--</div>
+                    <div>
+                        <p id="ui-user-name-desk" class="text-sm font-bold truncate w-32">Loading...</p>
+                        <p class="text-[10px] text-blue-300">Teacher</p>
+                    </div>
+                </div>
+                <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-blue-100 bg-red-500/20 hover:bg-red-500 hover:text-white transition border border-red-500/30">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
                 </button>
             </div>
         </aside>
 
-        <div id="sidebar-overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-30 hidden md:hidden transition-opacity" onclick="toggleSidebar()"></div>
-        <div class="flex-1 flex flex-col h-full overflow-hidden relative">
-            <header class="h-20 glass-panel flex items-center justify-between px-4 sm:px-6 md:px-10 flex-shrink-0 z-20 sticky top-0">
-                <div class="flex items-center gap-3 sm:gap-4">
-                    <button class="md:hidden w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-600 flex items-center justify-center shadow-sm" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
-                    <h2 id="topbar-title" class="text-xl sm:text-2xl font-extrabold text-slate-800 tracking-tight truncate max-w-[200px] sm:max-w-md">Dashboard Overview</h2>
-                </div>
-                <div class="flex items-center gap-3 sm:gap-5">
-                    <div class="flex items-center gap-3 sm:border-l border-slate-200 sm:pl-5">
-                        <div class="text-right hidden sm:block">
-                            <p id="ui-user-name" class="text-sm font-bold text-slate-800 leading-none">Loading...</p>
-                            <p class="text-xs text-slate-500 font-medium mt-1">Teacher</p>
-                        </div>
-                        <div id="ui-user-avatar" class="w-10 h-10 rounded-xl bg-gradient-to-br from-awBlue to-blue-700 flex items-center justify-center text-white font-bold text-sm shadow-md">--</div>
+        <main class="flex-1 h-full overflow-hidden flex flex-col relative w-full bg-transparent">
+            
+            <!-- HEADER MOBILE -->
+            <header class="lg:hidden bg-white/80 backdrop-blur-md border-b border-slate-200 p-4 flex justify-between items-center z-20 shrink-0 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div id="ui-user-avatar-mob" class="w-9 h-9 rounded-full bg-gradient-to-br from-aw-navy to-blue-800 text-white flex items-center justify-center font-bold text-xs shadow-md">--</div>
+                    <div>
+                        <h2 class="font-black text-aw-navy text-sm leading-tight">Teacher Portal</h2>
+                        <p id="ui-user-name-mob" class="text-[10px] font-medium text-slate-500">Loading...</p>
                     </div>
                 </div>
+                <button onclick="handleLogout()" class="text-red-500 p-2.5 bg-red-50 rounded-xl hover:bg-red-100 border border-red-100 transition"><i class="fa-solid fa-power-off text-sm"></i></button>
             </header>
 
-            <main class="flex-1 overflow-y-auto p-4 sm:p-6 md:p-10 relative z-10" id="main-content">
+            <!-- SCROLLABLE CONTENT AREA -->
+            <div id="content-scroll-area" class="flex-1 overflow-y-auto p-4 md:p-8 pb-28 md:pb-8 relative scroll-smooth custom-scrollbar">
                 
-                <div id="tab-dashboard" class="tab-content fade-in">
-                    <!-- Hero Card -->
-                    <div class="bg-gradient-to-r from-awBlue via-blue-700 to-indigo-800 rounded-3xl p-6 sm:p-8 md:p-10 text-white shadow-glow mb-6 relative overflow-hidden">
-                        <div class="absolute -right-10 -top-20 opacity-10 transform rotate-12"><i class="fa-solid fa-graduation-cap text-[200px]"></i></div>
-                        <div class="absolute top-0 left-0 w-full h-full bg-hero-pattern opacity-20 pointer-events-none"></div>
-                        <div class="relative z-10">
-                            <h3 id="ui-welcome-msg" class="text-2xl sm:text-3xl font-extrabold mb-2 tracking-tight">Ahlan Wa Sahlan!</h3>
-                            <p class="text-blue-100 mb-6 text-sm md:text-base max-w-xl">Semoga harimu penuh berkah dan kemudahan dalam mendidik generasi Rabbani di Al-Wildan 15.</p>
-                            <div class="flex flex-wrap gap-3 sm:gap-4">
-                                <div class="bg-white/10 backdrop-blur-md px-4 sm:px-5 py-3 rounded-2xl border border-white/20 shadow-sm flex-1 sm:flex-none min-w-[140px]">
-                                    <p class="text-[10px] text-blue-200 uppercase tracking-widest font-bold mb-1"><i class="fa-solid fa-star mr-1"></i>STATUS</p>
-                                    <p id="ui-wali-kelas" class="font-bold text-sm sm:text-lg truncate">Guru Aktif</p>
-                                </div>
-                                <div class="bg-white/10 backdrop-blur-md px-4 sm:px-5 py-3 rounded-2xl border border-white/20 shadow-sm flex-1 sm:flex-none min-w-[140px]">
-                                    <p class="text-[10px] text-blue-200 uppercase tracking-widest font-bold mb-1"><i class="fa-solid fa-shield-cat mr-1"></i>Sistem Terpadu</p>
-                                    <p class="font-bold text-sm sm:text-lg">Portal V4.0 (Supabase)</p>
+                <!-- TAB: DASHBOARD -->
+                <div id="tab-dashboard" class="tab-content fade-in max-w-6xl mx-auto space-y-6">
+                    
+                    <!-- Hero Banner -->
+                    <div class="relative bg-gradient-to-r from-aw-navy via-blue-800 to-indigo-900 rounded-3xl p-6 md:p-10 overflow-hidden shadow-lg border border-blue-700/50">
+                        <div class="absolute -top-24 -right-24 w-64 h-64 bg-aw-yellow rounded-full mix-blend-multiply filter blur-3xl opacity-30"></div>
+                        <div class="absolute -bottom-10 -left-10 w-48 h-48 bg-aw-blue rounded-full mix-blend-multiply filter blur-3xl opacity-40"></div>
+                        
+                        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                            <div>
+                                <p class="text-blue-200 font-medium mb-1 flex items-center gap-2 text-sm">
+                                    <i class="fa-solid fa-sparkles text-aw-yellow"></i> Ahlan Wa Sahlan,
+                                </p>
+                                <h1 id="ui-welcome-msg" class="text-2xl sm:text-4xl font-black text-white mb-3 tracking-tight">Selamat Datang!</h1>
+                                <p class="text-sm text-blue-100 max-w-lg leading-relaxed mb-6">Semoga harimu penuh berkah dan kemudahan dalam mendidik generasi Rabbani di Al-Wildan 15.</p>
+                                
+                                <div class="flex flex-wrap gap-3">
+                                    <div class="bg-white/10 backdrop-blur-md px-4 py-2.5 rounded-xl border border-white/20 shadow-sm flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-lg bg-aw-yellow/20 text-aw-yellow flex items-center justify-center"><i class="fa-solid fa-star"></i></div>
+                                        <div>
+                                            <p class="text-[9px] text-blue-200 uppercase tracking-widest font-bold">Status</p>
+                                            <p class="font-bold text-sm text-white leading-tight">Guru Aktif</p>
+                                        </div>
+                                    </div>
+                                    <div class="bg-white/10 backdrop-blur-md px-4 py-2.5 rounded-xl border border-white/20 shadow-sm flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center"><i class="fa-solid fa-shield-halved"></i></div>
+                                        <div>
+                                            <p class="text-[9px] text-blue-200 uppercase tracking-widest font-bold">Sistem</p>
+                                            <p class="font-bold text-sm text-white leading-tight">Portal V4.0</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Dynamic Ticker -->
-                    <div class="bg-white rounded-2xl shadow-soft border border-slate-100 p-3 sm:p-4 mb-8 flex items-center relative overflow-hidden">
-                        <div class="bg-blue-50 text-awBlue w-10 h-10 rounded-xl flex items-center justify-center shrink-0 z-10 relative shadow-sm border border-blue-100"><i class="fa-solid fa-bullhorn text-sm"></i></div>
+                    <div class="glass-card p-3 sm:p-4 flex items-center relative overflow-hidden">
+                        <div class="bg-blue-50 text-aw-blue w-10 h-10 rounded-xl flex items-center justify-center shrink-0 z-10 relative shadow-sm border border-blue-100"><i class="fa-solid fa-bullhorn text-sm"></i></div>
                         <div class="ticker-wrap ml-3 sm:ml-4 mr-2">
                             <div id="ui-ticker-content" class="ticker-move text-sm font-semibold text-slate-600 flex items-center gap-8">
                                 <span><i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Mengambil data event terbaru...</span>
@@ -269,39 +326,39 @@
 
                     <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2"><i class="fa-solid fa-calendar-day"></i> Pantauan Hari Ini</h3>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-8 items-start">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 items-start">
                         <!-- CARD 1: Jadwal & JP -->
-                        <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-soft border border-slate-100 flex flex-col relative overflow-hidden h-fit">
+                        <div class="glass-card p-5 sm:p-6 flex flex-col relative overflow-hidden h-fit">
                             <div class="flex justify-between items-start mb-4">
-                                <div class="w-12 h-12 rounded-xl bg-blue-50 text-awBlue flex items-center justify-center text-xl shadow-sm border border-blue-100"><i class="fa-solid fa-chalkboard-user"></i></div>
-                                <span class="bg-slate-100 text-slate-500 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1"><i class="fa-regular fa-clock"></i> <span id="ui-total-jp">0 JP</span></span>
+                                <div class="w-12 h-12 rounded-2xl bg-blue-50 text-aw-blue flex items-center justify-center text-xl shadow-sm border border-blue-100"><i class="fa-solid fa-chalkboard-user"></i></div>
+                                <span class="bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1.5"><i class="fa-regular fa-clock"></i> <span id="ui-total-jp">0 JP</span></span>
                             </div>
-                            <h4 class="font-bold text-slate-800 text-lg mb-1">Jadwal Mengajar</h4>
-                            <p class="text-xs font-medium text-slate-400 mb-4">Daftar kelas Anda hari ini</p>
-                            <div id="ui-jadwal-container" class="pr-2 space-y-2">
+                            <h4 class="font-black text-slate-800 text-lg mb-1">Jadwal Mengajar</h4>
+                            <p class="text-xs font-medium text-slate-400 mb-5">Daftar kelas Anda hari ini</p>
+                            <div id="ui-jadwal-container" class="space-y-3">
                                 <p class="text-sm text-slate-500 font-medium italic"><i class="fa-solid fa-circle-notch fa-spin mr-1"></i> Memuat jadwal...</p>
                             </div>
                         </div>
 
                         <!-- CARD 2: Info Infal -->
-                        <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-soft border border-slate-100 flex flex-col relative overflow-hidden h-fit">
+                        <div class="glass-card p-5 sm:p-6 flex flex-col relative overflow-hidden h-fit border-t-4 border-t-aw-yellow">
                             <div class="flex justify-between items-start mb-4">
-                                <div class="w-12 h-12 rounded-xl bg-orange-50 text-awOrange flex items-center justify-center text-xl shadow-sm border border-orange-100"><i class="fa-solid fa-user-nurse"></i></div>
+                                <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl shadow-sm border border-amber-100"><i class="fa-solid fa-user-nurse"></i></div>
                             </div>
-                            <h4 class="font-bold text-slate-800 text-lg mb-1">Tugas Infal</h4>
-                            <p class="text-xs font-medium text-slate-400 mb-4">Amanah guru pengganti hari ini</p>
-                            <div id="ui-infal-container">
+                            <h4 class="font-black text-slate-800 text-lg mb-1">Tugas Infal</h4>
+                            <p class="text-xs font-medium text-slate-400 mb-5">Amanah guru pengganti hari ini</p>
+                            <div id="ui-infal-container" class="space-y-3">
                                 <p class="text-sm text-slate-500 font-medium italic"><i class="fa-solid fa-circle-notch fa-spin mr-1"></i> Memeriksa data...</p>
                             </div>
                         </div>
 
                         <!-- CARD 3: Persentase Kehadiran -->
-                        <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-soft border border-slate-100 flex flex-col relative overflow-hidden h-fit">
+                        <div class="glass-card p-5 sm:p-6 flex flex-col relative overflow-hidden h-fit border-t-4 border-t-aw-green">
                             <div class="flex justify-between items-start mb-4">
-                                <div class="w-12 h-12 rounded-xl bg-green-50 text-emerald-600 flex items-center justify-center text-xl shadow-sm border border-green-100"><i class="fa-solid fa-fingerprint"></i></div>
+                                <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl shadow-sm border border-emerald-100"><i class="fa-solid fa-fingerprint"></i></div>
                             </div>
-                            <h4 class="font-bold text-slate-800 text-lg mb-1">Performa Kehadiran</h4>
-                            <p class="text-xs font-medium text-slate-400 mb-4">Bulan berjalan (berdasarkan fingerprint)</p>
+                            <h4 class="font-black text-slate-800 text-lg mb-1">Performa Kehadiran</h4>
+                            <p class="text-xs font-medium text-slate-400 mb-5">Bulan berjalan (berdasarkan sidik jari)</p>
                             <div id="ui-kehadiran-container" class="flex flex-col justify-end mt-auto">
                                  <p class="text-sm text-slate-500 font-medium italic"><i class="fa-solid fa-circle-notch fa-spin mr-1"></i> Menghitung...</p>
                             </div>
@@ -309,61 +366,78 @@
                     </div>
                 </div>
 
-                <div id="tab-event" class="tab-content hidden-view fade-in">
+                <div id="tab-event" class="tab-content hidden fade-in max-w-6xl mx-auto space-y-6">
+                    <div class="flex justify-between items-center mb-4 border-b border-slate-200/50 pb-4">
+                        <div>
+                            <h2 class="text-2xl font-black text-aw-navy mb-1">Event & Kepanitiaan</h2>
+                            <p class="text-slate-500 text-sm font-medium">Pantau progress tugas kepanitiaan event sekolah.</p>
+                        </div>
+                    </div>
                     <div id="event-dynamic-container" class="space-y-6">
-                        <div class="text-center p-12"><i class="fa-solid fa-circle-notch fa-spin text-3xl text-awBlue"></i></div>
+                        <div class="glass-card p-12 text-center"><i class="fa-solid fa-circle-notch fa-spin text-3xl text-aw-blue"></i></div>
                     </div>
                 </div>
                 
-                <div id="tab-commission" class="tab-content hidden-view fade-in">
+                <div id="tab-commission" class="tab-content hidden fade-in max-w-6xl mx-auto space-y-6">
+                    <div class="flex justify-between items-center mb-4 border-b border-slate-200/50 pb-4">
+                        <div>
+                            <h2 class="text-2xl font-black text-aw-navy mb-1">Manajemen Komisi</h2>
+                            <p class="text-slate-500 text-sm font-medium">Laporan program dan evaluasi komisi sekolah.</p>
+                        </div>
+                    </div>
                     <div id="comm-dynamic-container" class="space-y-6">
-                        <div class="text-center p-12"><i class="fa-solid fa-circle-notch fa-spin text-3xl text-awBlue"></i></div>
+                        <div class="glass-card p-12 text-center"><i class="fa-solid fa-circle-notch fa-spin text-3xl text-aw-blue"></i></div>
                     </div>
                 </div>
 
-                <div id="tab-eis" class="tab-content hidden-view fade-in">
-                    <div class="h-full flex flex-col items-center justify-center p-8 text-center min-h-[60vh]">
-                        <div class="w-24 h-24 sm:w-28 sm:h-28 bg-gradient-to-br from-blue-50 to-blue-100 text-awBlue rounded-full flex items-center justify-center text-4xl sm:text-5xl mb-6 shadow-soft border border-blue-100 relative">
-                            <i class="fa-solid fa-globe"></i><div class="absolute inset-0 rounded-full border-2 border-awBlue animate-ping opacity-20"></div>
+                <div id="tab-eis" class="tab-content hidden fade-in max-w-6xl mx-auto h-full">
+                    <div class="glass-card flex flex-col items-center justify-center p-8 text-center min-h-[60vh] h-full border-t-4 border-t-aw-blue">
+                        <div class="w-24 h-24 sm:w-28 sm:h-28 bg-gradient-to-br from-blue-50 to-blue-100 text-aw-blue rounded-3xl flex items-center justify-center text-4xl sm:text-5xl mb-6 shadow-md border border-blue-200 relative transform rotate-3">
+                            <i class="fa-solid fa-globe"></i><div class="absolute inset-0 rounded-3xl border-2 border-aw-blue animate-ping opacity-20"></div>
                         </div>
-                        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 mb-3 tracking-tight">Exam Input System</h2>
-                        <p class="text-slate-500 font-medium mb-8 max-w-md text-sm sm:text-base">Sistem informasi akademik dan penilaian terpadu Al-Wildan Islamic School 15 Bekasi.</p>
-                        <a href="https://alwildan15bekasi.github.io/EIS/" target="_blank" class="px-6 sm:px-8 py-3.5 sm:py-4 bg-awBlue text-white font-bold rounded-2xl shadow-glow hover:bg-blue-800 hover:-translate-y-1 transition-all flex items-center gap-3 text-sm sm:text-base">
+                        <h2 class="text-2xl sm:text-3xl font-black text-aw-navy mb-3 tracking-tight">Exam Input System</h2>
+                        <p class="text-slate-500 font-medium mb-8 max-w-md text-sm sm:text-base leading-relaxed">Sistem informasi akademik dan penilaian terpadu Al-Wildan Islamic School 15 Bekasi.</p>
+                        <a href="https://alwildan15bekasi.github.io/EIS/" target="_blank" class="px-8 py-4 bg-aw-navy text-white font-bold rounded-2xl shadow-lg shadow-aw-navy/30 hover:bg-blue-800 hover:-translate-y-1 transition-all flex items-center gap-3 text-sm sm:text-base">
                             Buka Portal EIS <i class="fa-solid fa-arrow-up-right-from-square"></i>
                         </a>
                     </div>
                 </div>
 
-                <div id="tab-report" class="tab-content hidden-view fade-in">
-                    <div class="h-full flex flex-col items-center justify-center p-8 text-center min-h-[60vh]">
-                        <div class="w-24 h-24 sm:w-28 sm:h-28 mb-6 relative">
-                            <img src="https://i.ibb.co.com/27J08HWy/favicon.png" alt="Logo Gray" class="w-full h-full opacity-30 grayscale" onerror="this.src='https://placehold.co/120x120/cccccc/ffffff?text=AW'">
+                <div id="tab-report" class="tab-content hidden fade-in max-w-6xl mx-auto h-full">
+                    <div class="glass-card flex flex-col items-center justify-center p-8 text-center min-h-[60vh] h-full border-t-4 border-t-slate-400">
+                        <div class="w-24 h-24 sm:w-28 sm:h-28 mb-6 relative bg-slate-100 rounded-full p-4 flex items-center justify-center shadow-inner">
+                            <img src="https://i.ibb.co.com/27J08HWy/favicon.png" alt="Logo Gray" class="w-full h-full opacity-30 grayscale object-contain" onerror="this.src='https://placehold.co/120x120/cccccc/ffffff?text=AW'">
                         </div>
-                        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-300 mb-3 tracking-tight">Report Tools System</h2>
-                        <p class="text-slate-400 font-medium mb-8 max-w-md text-sm sm:text-base">Modul pengisian dan generate rapor siswa terintegrasi sedang dalam tahap pengembangan tim IT.</p>
-                        <div class="px-6 py-3 border-2 border-orange-100 bg-orange-50/50 text-orange-500 font-bold rounded-2xl flex items-center gap-3 text-sm shadow-sm">
+                        <h2 class="text-2xl sm:text-3xl font-black text-slate-400 mb-3 tracking-tight">Report Tools System</h2>
+                        <p class="text-slate-400 font-medium mb-8 max-w-md text-sm sm:text-base leading-relaxed">Modul pengisian dan generate rapor siswa terintegrasi sedang dalam tahap pengembangan tim IT.</p>
+                        <div class="px-6 py-3 bg-amber-50 border border-amber-200 text-amber-600 font-bold rounded-2xl flex items-center gap-3 text-sm shadow-sm">
                             <i class="fa-solid fa-person-digging"></i> Under Construction
                         </div>
                     </div>
                 </div>
 
-                <div id="tab-scanner" class="tab-content hidden-view fade-in">
-                    <div class="max-w-md mx-auto">
-                        <div class="bg-white p-1.5 rounded-2xl flex mb-6 shadow-soft border border-slate-100">
-                            <button id="btn-scan-in" onclick="setScanMode('in')" class="flex-1 py-3 text-xs sm:text-sm font-bold rounded-xl bg-slate-800 text-white shadow-md transition-all">CHECK IN</button>
-                            <button id="btn-scan-out" onclick="setScanMode('out')" class="flex-1 py-3 text-xs sm:text-sm font-bold rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all">CHECK OUT</button>
+                <div id="tab-scanner" class="tab-content hidden fade-in max-w-6xl mx-auto">
+                    <div class="glass-card max-w-md mx-auto p-6 md:p-8 border-t-4 border-t-emerald-500">
+                        <div class="text-center mb-6">
+                            <h2 class="text-2xl font-black text-aw-navy mb-1">Web Scanner</h2>
+                            <p class="text-slate-500 text-sm font-medium">Validasi JP Kelas (Check-In / Out).</p>
+                        </div>
+
+                        <div class="bg-slate-100 p-1.5 rounded-2xl flex mb-6 shadow-inner border border-slate-200">
+                            <button id="btn-scan-in" onclick="setScanMode('in')" class="flex-1 py-3 text-xs sm:text-sm font-bold rounded-xl bg-aw-navy text-white shadow-md transition-all">CHECK IN</button>
+                            <button id="btn-scan-out" onclick="setScanMode('out')" class="flex-1 py-3 text-xs sm:text-sm font-bold rounded-xl text-slate-500 hover:text-slate-800 hover:bg-white transition-all">CHECK OUT</button>
                         </div>
                         
                         <div class="bg-slate-900 rounded-3xl p-4 sm:p-6 shadow-2xl border border-slate-800 flex flex-col items-center relative overflow-hidden">
-                            <div class="absolute inset-0 bg-hero-pattern opacity-10 pointer-events-none"></div>
+                            <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(rgba(255, 255, 255, 0.5) 1px, transparent 1px); background-size: 20px 20px;"></div>
                             
                             <div class="relative z-10 mb-4 flex flex-col items-center w-full">
-                                <span class="px-3 py-1 bg-green-500/20 text-green-400 text-[10px] font-bold uppercase tracking-widest rounded-full border border-green-500/30 mb-2 animate-pulse"><i class="fa-solid fa-video mr-1"></i> Smart Validation v4.0</span>
-                                <h3 id="scan-mode-title" class="text-white font-bold text-xl tracking-tight">Check In Mode</h3>
+                                <span class="px-3 py-1 bg-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase tracking-widest rounded-full border border-emerald-500/30 mb-2 animate-pulse"><i class="fa-solid fa-video mr-1"></i> Smart Validation v4.0</span>
+                                <h3 id="scan-mode-title" class="text-white font-black text-xl tracking-tight">Check In Mode</h3>
                             </div>
                             
-                            <div class="w-full scanner-container scanner-corners mb-4 flex items-center justify-center relative bg-black border border-slate-700">
-                                <button onclick="flipCamera()" class="absolute top-3 right-3 z-20 bg-slate-800/80 hover:bg-slate-700 p-2.5 rounded-full text-white backdrop-blur-md shadow-lg transition-colors" title="Putar Kamera">
+                            <div class="w-full scanner-container scanner-corners mb-6 flex items-center justify-center relative bg-black border border-slate-700">
+                                <button onclick="flipCamera()" class="absolute top-3 right-3 z-20 bg-slate-800/80 hover:bg-slate-700 p-2.5 rounded-full text-white backdrop-blur-md shadow-lg transition-colors border border-slate-600" title="Putar Kamera">
                                     <i class="fa-solid fa-camera-rotate text-lg"></i>
                                 </button>
                                 <div id="reader" class="w-full h-full absolute inset-0 z-0"></div>
@@ -375,14 +449,43 @@
                             </div>
                             <p class="text-slate-400 text-[11px] sm:text-xs text-center relative z-10 px-2 sm:px-4 mb-4 leading-relaxed">Arahkan kamera ke QR Code kelas. Sistem akan otomatis mendeteksi dan memvalidasi JP Anda.</p>
                             
-                            <button id="btn-toggle-camera" onclick="toggleCamera()" class="relative z-10 w-full sm:w-auto px-6 py-3.5 bg-awBlue hover:bg-blue-800 text-white text-sm font-bold rounded-xl transition-all shadow-[0_4px_14px_rgba(0,32,178,0.3)]">
+                            <button id="btn-toggle-camera" onclick="toggleCamera()" class="relative z-10 w-full px-6 py-3.5 bg-aw-blue hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-[0_4px_14px_rgba(37,99,235,0.4)]">
                                 <i class="fa-solid fa-camera mr-2"></i> Nyalakan Kamera
                             </button>
                         </div>
                     </div>
                 </div>
-            </main>
-        </div>
+            </div>
+
+            <nav class="lg:hidden fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-slate-200 z-30 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
+                <div class="flex overflow-x-auto hide-scrollbar justify-start items-center p-2 gap-2 w-full px-4 scroll-smooth">
+                    <button onclick="switchTab('dashboard')" id="mob-dashboard" class="flex flex-col items-center p-2 min-w-[75px] text-aw-blue transition-colors">
+                        <div class="p-1.5 bg-blue-50 rounded-xl mb-1"><i class="fa-solid fa-chart-pie text-lg"></i></div>
+                        <span class="text-[9px] font-bold uppercase tracking-wide">Beranda</span>
+                    </button>
+                    <button onclick="switchTab('event')" id="mob-event" class="flex flex-col items-center p-2 min-w-[75px] text-slate-400 transition-colors">
+                        <div class="p-1.5 rounded-xl mb-1"><i class="fa-solid fa-calendar-check text-lg"></i></div>
+                        <span class="text-[9px] font-bold uppercase tracking-wide">Event</span>
+                    </button>
+                    <button onclick="switchTab('commission')" id="mob-commission" class="flex flex-col items-center p-2 min-w-[75px] text-slate-400 transition-colors">
+                        <div class="p-1.5 rounded-xl mb-1"><i class="fa-solid fa-users-gear text-lg"></i></div>
+                        <span class="text-[9px] font-bold uppercase tracking-wide">Komisi</span>
+                    </button>
+                    <button onclick="switchTab('eis')" id="mob-eis" class="flex flex-col items-center p-2 min-w-[75px] text-slate-400 transition-colors">
+                        <div class="p-1.5 rounded-xl mb-1"><i class="fa-solid fa-globe text-lg"></i></div>
+                        <span class="text-[9px] font-bold uppercase tracking-wide">EIS</span>
+                    </button>
+                    <button onclick="switchTab('scanner')" id="mob-scanner" class="flex flex-col items-center p-2 min-w-[75px] text-slate-400 transition-colors relative">
+                        <div class="p-1.5 rounded-xl mb-1"><i class="fa-solid fa-qrcode text-lg"></i></div>
+                        <span class="text-[9px] font-bold uppercase tracking-wide">Scanner</span>
+                    </button>
+                    <button onclick="switchTab('report')" id="mob-report" class="flex flex-col items-center p-2 min-w-[75px] text-slate-400 transition-colors">
+                        <div class="p-1.5 rounded-xl mb-1"><i class="fa-solid fa-pen-to-square text-lg"></i></div>
+                        <span class="text-[9px] font-bold uppercase tracking-wide">Rapor</span>
+                    </button>
+                </div>
+            </nav>
+        </main>
     </div>
 
     <script>
@@ -430,17 +533,17 @@
             return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
         }
 
+        // --- AUTH & INITIALIZATION ---
         async function handleLogin(e) {
             e.preventDefault();
             const btn = document.getElementById('btn-login');
             const userInp = document.getElementById('inp-username').value;
             const passInp = document.getElementById('inp-password').value;
             
-            btn.innerHTML = `<div class="loader-spin"></div> <span>Authenticating...</span>`;
+            btn.innerHTML = `<div class="loader-spin"></div> <span class="ml-2">Authenticating...</span>`;
             btn.disabled = true;
 
             try {
-                // Fetch from Supabase master_guru
                 const { data, error } = await supabaseClient
                     .from('master_guru')
                     .select('*')
@@ -448,27 +551,28 @@
                     .eq('password', passInp)
                     .single();
 
-                if (error || !data) {
-                    throw new Error("Username atau Password salah.");
-                }
+                if (error || !data) throw new Error("Username atau Password salah.");
 
-                appState.user = { 
-                    username: data.username, 
-                    namaLengkap: data.nama_guru
-                };
+                appState.user = { username: data.username, namaLengkap: data.nama_guru };
                 
-                document.getElementById('ui-user-name').innerText = appState.user.namaLengkap;
-                document.getElementById('ui-user-avatar').innerText = appState.user.namaLengkap.substring(0, 2).toUpperCase();
+                const shortName = appState.user.namaLengkap.substring(0, 2).toUpperCase();
+                document.getElementById('ui-user-name-desk').innerText = appState.user.namaLengkap;
+                document.getElementById('ui-user-avatar-desk').innerText = shortName;
+                document.getElementById('ui-user-name-mob').innerText = appState.user.namaLengkap;
+                document.getElementById('ui-user-avatar-mob').innerText = shortName;
+                
                 document.getElementById('ui-welcome-msg').innerText = `Ahlan Wa Sahlan, ${appState.user.namaLengkap.split(' ')[0]}!`;
 
-                // Fetch Teacher List for Dropdowns
                 const { data: tData } = await supabaseClient.from('master_guru').select('nama_guru').order('nama_guru');
                 if(tData) appState.teacherList = tData.map(t => t.nama_guru);
 
                 document.getElementById('view-login').classList.add('opacity-0');
                 setTimeout(() => {
                     document.getElementById('view-login').classList.add('hidden');
-                    document.getElementById('view-app').classList.remove('hidden-view');
+                    const viewApp = document.getElementById('view-app');
+                    viewApp.classList.remove('hidden');
+                    setTimeout(()=> viewApp.classList.remove('opacity-0'), 50);
+                    
                     showToast(`Login berhasil! Selamat bertugas.`, 'success');
                     
                     loadDashboardData();
@@ -477,12 +581,115 @@
 
             } catch (err) {
                 showToast(err.message || "Gagal menghubungi server", 'error');
+                btn.innerHTML = `<span>Masuk Sekarang</span> <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>`;
+                btn.disabled = false;
             }
-            
-            btn.innerHTML = `<span>Sign In</span> <i class="fa-solid fa-arrow-right-to-bracket"></i>`;
-            btn.disabled = false;
         }
 
+        function handleLogout() {
+            appState.user = null;
+            const viewApp = document.getElementById('view-app');
+            viewApp.classList.add('opacity-0');
+            setTimeout(() => {
+                viewApp.classList.add('hidden');
+                document.getElementById('view-login').classList.remove('hidden');
+                setTimeout(() => document.getElementById('view-login').classList.remove('opacity-0'), 50);
+                document.getElementById('login-form').reset();
+                document.getElementById('btn-login').innerHTML = `<span>Masuk Sekarang</span> <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>`;
+                document.getElementById('btn-login').disabled = false;
+                switchTab('dashboard'); 
+                if(isScannerRunning) stopScanner();
+            }, 400);
+        }
+
+        // --- NAVIGATION & UI HELPERS ---
+        function switchTab(tabId) {
+            const tabs = ['dashboard', 'event', 'commission', 'eis', 'scanner', 'report'];
+            
+            tabs.forEach(t => {
+                // Hide content
+                const contentEl = document.getElementById(`tab-${t}`);
+                if(contentEl) contentEl.classList.add('hidden');
+                
+                // Reset Desktop Sidebar Nav
+                const dNav = document.getElementById(`nav-${t}`);
+                if(dNav) {
+                    dNav.classList.remove('bg-white/10', 'text-white', 'border-l-4', 'border-aw-yellow');
+                    dNav.classList.add('text-blue-200', 'border-transparent');
+                }
+                
+                // Reset Mobile Bottom Nav
+                const mNav = document.getElementById(`mob-${t}`);
+                if(mNav) {
+                    mNav.classList.remove('text-aw-blue');
+                    mNav.classList.add('text-slate-400');
+                    const mNavIconBg = mNav.querySelector('div');
+                    if(mNavIconBg) mNavIconBg.classList.remove('bg-blue-50');
+                }
+            });
+
+            // Activate Selected Tab
+            const activeContent = document.getElementById(`tab-${tabId}`);
+            if(activeContent) activeContent.classList.remove('hidden');
+            document.getElementById('content-scroll-area').scrollTo(0,0);
+            
+            // Highlight Desktop
+            const actDNav = document.getElementById(`nav-${tabId}`);
+            if(actDNav) {
+                actDNav.classList.add('bg-white/10', 'text-white', 'border-l-4', 'border-aw-yellow');
+                actDNav.classList.remove('text-blue-200', 'border-transparent');
+            }
+            
+            // Highlight Mobile
+            const actMNav = document.getElementById(`mob-${tabId}`);
+            if(actMNav) {
+                actMNav.classList.add('text-aw-blue');
+                actMNav.classList.remove('text-slate-400');
+                const actMNavIconBg = actMNav.querySelector('div');
+                if(actMNavIconBg) actMNavIconBg.classList.add('bg-blue-50');
+                actMNav.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+
+            if (tabId !== 'scanner' && isScannerRunning) stopScanner();
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let colorClass = 'toast info';
+            let icon = 'fa-circle-info'; 
+            if (type === 'error') { colorClass = 'toast error'; icon = 'fa-triangle-exclamation'; }
+            else if (type === 'success') { colorClass = 'toast success'; icon = 'fa-check-circle'; }
+
+            toast.className = colorClass;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-xl shrink-0"></i> <span class="leading-tight flex-1">${message}</span>`;
+            
+            container.appendChild(toast);
+            void toast.offsetWidth; 
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 3500);
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            const innerDiv = modal.querySelector('div');
+            modal.classList.add('opacity-0');
+            if(innerDiv) innerDiv.classList.replace('scale-100', 'scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            const innerDiv = modal.querySelector('div');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                if(innerDiv) innerDiv.classList.replace('scale-95', 'scale-100');
+            }, 20);
+        }
+
+        // --- DASHBOARD DATA LOADING ---
         async function loadDashboardData() {
             try {
                 const hariIni = getHariIniStr();
@@ -494,17 +701,17 @@
                 const tickerWrap = document.getElementById('ui-ticker-content');
                 if(eventsData && eventsData.length > 0) {
                     let html = '';
-                    const colors = ['awOrange', 'awBlue', 'awGreen'];
+                    const colors = ['aw-yellow', 'aw-blue', 'aw-green'];
                     eventsData.forEach((ev, i) => {
                         let c = colors[i % colors.length];
-                        html += `<span class="flex items-center gap-2 bg-slate-50 px-3 py-1 rounded-lg border border-slate-100"><i class="fa-solid fa-thumbtack text-${c}"></i> <strong>${ev.nama_event}:</strong> ${ev.tanggal_pelaksanaan || '-'}</span>`;
+                        html += `<span class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200"><i class="fa-solid fa-thumbtack text-${c}"></i> <strong>${ev.nama_event}:</strong> ${ev.tanggal_pelaksanaan || '-'}</span>`;
                     });
                     tickerWrap.innerHTML = html + html; 
                 } else {
                     tickerWrap.innerHTML = `<span>Belum ada event terdekat.</span>`;
                 }
 
-                // 2. Jadwal Mengajar
+                // 2. Jadwal Mengajar (Refactored styling)
                 const { data: jadwalData } = await supabaseClient.from('master_jadwal')
                     .select('*').eq('guru', namaUser).eq('hari', hariIni).order('sesi_jp');
                 
@@ -516,21 +723,21 @@
                     let jadwalHtml = '';
                     jadwalData.forEach(j => {
                         jadwalHtml += `
-                            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                            <div class="flex items-center justify-between p-3 rounded-2xl bg-white/70 border border-white shadow-sm hover:border-blue-200 transition">
                                 <div>
-                                    <p class="font-bold text-sm text-slate-800 truncate max-w-[120px]">${j.kelas}</p>
-                                    <p class="text-[10px] text-slate-500 font-medium uppercase truncate">${j.mata_pelajaran}</p>
+                                    <p class="font-black text-sm text-slate-800 truncate max-w-[120px]">${j.kelas}</p>
+                                    <p class="text-[10px] text-slate-500 font-bold uppercase truncate">${j.mata_pelajaran}</p>
                                 </div>
-                                <span class="bg-awBlueLight text-awBlue font-bold text-xs px-2 py-1 rounded-lg shrink-0">${j.sesi_jp}</span>
+                                <span class="bg-blue-100 text-aw-blue font-black text-xs px-2.5 py-1 rounded-lg shrink-0">${j.sesi_jp}</span>
                             </div>`;
                     });
                     jadwalContainer.innerHTML = jadwalHtml;
                 } else {
                     jpCounter.innerText = `0 JP`;
-                    jadwalContainer.innerHTML = `<div class="bg-slate-50 border border-slate-100 p-4 rounded-xl text-center flex flex-col items-center justify-center min-h-[90px]"><i class="fa-regular fa-calendar-xmark text-2xl text-slate-300 mb-2 block"></i><p class="text-xs text-slate-500 font-medium">Tidak ada jadwal reguler hari ini.</p></div>`;
+                    jadwalContainer.innerHTML = `<div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl text-center flex flex-col items-center justify-center min-h-[90px]"><i class="fa-regular fa-calendar-xmark text-2xl text-slate-300 mb-2 block"></i><p class="text-xs text-slate-500 font-medium">Tidak ada jadwal reguler hari ini.</p></div>`;
                 }
 
-                // 3. Info Infal
+                // 3. Info Infal (Refactored styling)
                 const { data: infalData } = await supabaseClient.from('data_infal')
                     .select('*').eq('guru_pengganti', namaUser).eq('tanggal', tglIni);
                 
@@ -539,28 +746,25 @@
                     let infalHtml = '';
                     infalData.forEach(inf => {
                         infalHtml += `
-                            <div class="bg-orange-50 border border-orange-200 p-3.5 rounded-xl relative overflow-hidden mb-2">
-                                <div class="absolute right-0 top-0 w-16 h-16 bg-orange-500 opacity-5 rounded-full blur-xl"></div>
-                                <span class="bg-orange-100 text-orange-600 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider mb-1.5 inline-block">TUGAS INFAL</span>
-                                <p class="text-[11px] sm:text-xs text-slate-700 font-medium leading-snug">Gantikan <strong>${inf.guru_keluar}</strong> di <strong class="text-awOrange">${inf.id_kelas}</strong> (<span class="text-awOrange">${inf.sesi_jp}</span>)</p>
+                            <div class="bg-amber-50/80 border border-amber-200 p-4 rounded-2xl relative overflow-hidden mb-3 shadow-sm hover:shadow transition">
+                                <div class="absolute right-0 top-0 w-16 h-16 bg-amber-400 opacity-10 rounded-full blur-xl"></div>
+                                <span class="bg-amber-200 text-amber-800 text-[9px] font-black px-2 py-0.5 rounded-sm uppercase tracking-wider mb-2 inline-block">TUGAS INFAL</span>
+                                <p class="text-[11px] sm:text-xs text-slate-700 font-medium leading-snug">Gantikan <strong>${inf.guru_keluar}</strong> di <strong class="text-aw-orange">${inf.id_kelas}</strong> (<span class="text-aw-orange font-bold">${inf.sesi_jp}</span>)</p>
                             </div>`;
                     });
                     infalContainer.innerHTML = infalHtml;
                 } else {
-                    infalContainer.innerHTML = `<div class="bg-slate-50 border border-slate-100 p-4 rounded-xl text-center flex flex-col items-center justify-center min-h-[90px]"><i class="fa-solid fa-mug-hot text-xl text-slate-300 mb-1"></i><p class="text-xs text-slate-500 font-medium">Aman, tidak ada tugas infal.</p></div>`;
+                    infalContainer.innerHTML = `<div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl text-center flex flex-col items-center justify-center min-h-[90px]"><i class="fa-solid fa-mug-hot text-xl text-slate-300 mb-1"></i><p class="text-xs text-slate-500 font-medium">Aman, tidak ada tugas infal.</p></div>`;
                 }
 
-                // 4. Persentase Kehadiran (Dengan Toleransi Pengaturan)
+                // 4. Persentase Kehadiran
                 const startOfMonth = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-01`;
                 const { data: hadirData } = await supabaseClient.from('absensi_gerbang')
                     .select('waktu_scan, tanggal').eq('nama_guru', namaUser).gte('tanggal', startOfMonth);
                 
-                // Fetch Pengaturan Gate (Default: 07:00:00)
                 const { data: pengData } = await supabaseClient.from('pengaturan')
                     .select('nilai').eq('tipe', 'Reguler').eq('nama_pengaturan', 'Jam Masuk Gerbang').limit(1).single();
                 let batasMasukStr = pengData && pengData.nilai ? pengData.nilai : '07:00:00';
-                
-                // Tambah toleransi 5 menit agar tidak langsung telat
                 let batasToleransi = adjustTimeStr(batasMasukStr, 5);
 
                 const hadirContainer = document.getElementById('ui-kehadiran-container');
@@ -573,36 +777,37 @@
                     
                     hadirContainer.innerHTML = `
                         <div class="flex items-end gap-2 mb-1">
-                            <span class="text-4xl sm:text-5xl font-extrabold text-emerald-500 leading-none">${pct}%</span>
+                            <span class="text-4xl sm:text-5xl font-black text-aw-green leading-none">${pct}%</span>
                             <span class="text-[10px] sm:text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider"><i class="fa-solid fa-arrow-trend-up"></i> HADIR</span>
                         </div>
-                        <p class="text-xs font-bold text-slate-600 mb-4">${total} HARI TERCATAT</p>
+                        <p class="text-[11px] font-bold text-slate-500 mb-5 uppercase tracking-wide bg-emerald-50 text-center py-1 rounded border border-emerald-100">${total} HARI TERCATAT</p>
                         
-                        <div class="space-y-2.5">
+                        <div class="space-y-3">
                             <div>
                                 <div class="flex justify-between text-[10px] sm:text-xs font-bold mb-1"><span class="text-emerald-600">Tepat Waktu</span><span class="text-slate-600">${tepatWaktu}x</span></div>
-                                <div class="w-full bg-slate-100 rounded-full h-1.5"><div class="bg-emerald-500 h-1.5 rounded-full transition-all" style="width: ${pct}%"></div></div>
+                                <div class="w-full bg-slate-100 rounded-full h-2"><div class="bg-aw-green h-2 rounded-full transition-all" style="width: ${pct}%"></div></div>
                             </div>
                             <div>
-                                <div class="flex justify-between text-[10px] sm:text-xs font-bold mb-1"><span class="text-rose-500">Terlambat</span><span class="text-slate-600">${telat}x</span></div>
-                                <div class="w-full bg-slate-100 rounded-full h-1.5"><div class="bg-rose-500 h-1.5 rounded-full transition-all" style="width: ${total > 0 ? (telat/total)*100 : 0}%"></div></div>
+                                <div class="flex justify-between text-[10px] sm:text-xs font-bold mb-1"><span class="text-red-500">Terlambat</span><span class="text-slate-600">${telat}x</span></div>
+                                <div class="w-full bg-slate-100 rounded-full h-2"><div class="bg-red-500 h-2 rounded-full transition-all" style="width: ${total > 0 ? (telat/total)*100 : 0}%"></div></div>
                             </div>
                         </div>
                     `;
                 }
             } catch(e) {
                 console.error("Dashboard Error:", e);
-                document.getElementById('ui-jadwal-container').innerHTML = `<p class="text-sm text-rose-500 font-medium">Gagal memuat data.</p>`;
+                document.getElementById('ui-jadwal-container').innerHTML = `<p class="text-sm text-red-500 font-medium">Gagal memuat data.</p>`;
             }
         }
 
+        // --- ROLES & DYNAMIC VIEWS ---
         async function loadTeacherRoles() {
             try {
                 const namaUser = appState.user.namaLengkap;
                 let finalEvents = [];
                 let finalComms = [];
 
-                // --- EVENTS LOGIC ---
+                // Events Role
                 const { data: eventKetua } = await supabaseClient.from('data_event').select('*').eq('pic_guru', namaUser);
                 if(eventKetua && eventKetua.length > 0) {
                     for(let ev of eventKetua) {
@@ -611,7 +816,6 @@
                         finalEvents.push({ role: 'ketua', title: ev.nama_event, panitia: panitia || [], allTasks: tasks || [] });
                     }
                 }
-                
                 const { data: eventMember } = await supabaseClient.from('event_kepanitiaan').select('*').eq('nama_guru_member', namaUser);
                 if(eventMember && eventMember.length > 0) {
                     for(let em of eventMember) {
@@ -620,7 +824,7 @@
                     }
                 }
 
-                // --- COMMISSIONS LOGIC ---
+                // Commissions Role
                 const { data: commKetua } = await supabaseClient.from('data_commission').select('*').eq('pic_guru', namaUser);
                 if(commKetua && commKetua.length > 0) {
                     for(let cm of commKetua) {
@@ -634,7 +838,6 @@
                         finalComms.push({ role: 'ketua', title: cm.tipe_komisi, programs: programs || [], allHistory: allProgHistory });
                     }
                 }
-
                 const { data: commPic } = await supabaseClient.from('commission_program').select('*').eq('pic_guru', namaUser);
                 if(commPic && commPic.length > 0) {
                     for(let cp of commPic) {
@@ -648,87 +851,16 @@
                 renderCommissionView();
             } catch(e) {
                 console.error("Multi-Role Error:", e);
-                showToast("Gagal menarik data jabatan.", "error");
             }
         }
 
-        // Helper Functions UI
-        function handleLogout() {
-            appState.user = null;
-            document.getElementById('view-app').classList.add('hidden-view');
-            document.getElementById('view-login').classList.remove('hidden');
-            setTimeout(() => document.getElementById('view-login').classList.remove('opacity-0'), 50);
-            document.getElementById('login-form').reset();
-            switchTab('dashboard'); 
-            if(isScannerRunning) stopScanner();
-        }
-
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden-view'));
-            document.querySelectorAll('.nav-item').forEach(el => {
-                el.classList.remove('bg-awBlueLight', 'text-awBlue');
-                el.classList.add('text-slate-500');
-                const iconBox = el.querySelector('div');
-                if(iconBox) {
-                    iconBox.classList.remove('bg-white', 'text-awBlue', 'shadow-sm');
-                    iconBox.classList.add('text-slate-400');
-                }
-            });
-            
-            document.getElementById(`tab-${tabId}`).classList.remove('hidden-view');
-            const activeNav = document.getElementById(`nav-${tabId}`);
-            activeNav.classList.remove('text-slate-500');
-            activeNav.classList.add('bg-awBlueLight', 'text-awBlue');
-            const activeIconBox = activeNav.querySelector('div');
-            if(activeIconBox) activeIconBox.classList.add('bg-white', 'text-awBlue', 'shadow-sm');
-            
-            const titles = { 'dashboard': 'Dashboard Overview', 'event': 'Event & Kepanitiaan', 'commission': 'Manajemen Komisi', 'eis': 'EIS System', 'scanner': 'Web Scanner', 'report': 'Report Tools' };
-            document.getElementById('topbar-title').innerText = titles[tabId] || 'Portal Guru';
-
-            if (tabId !== 'scanner' && isScannerRunning) stopScanner();
-            if(window.innerWidth < 768) toggleSidebar();
-        }
-
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('-translate-x-full');
-            document.getElementById('sidebar-overlay').classList.toggle('hidden');
-        }
-
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-triangle-exclamation' : 'fa-circle-info';
-            toast.innerHTML = `<i class="fa-solid ${icon} text-lg shrink-0"></i> <span class="font-medium leading-tight">${message}</span>`;
-            container.appendChild(toast);
-            void toast.offsetWidth; 
-            toast.classList.add('show');
-            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 3500);
-        }
-
-        function closeModal(id) {
-            const modal = document.getElementById(id);
-            modal.classList.add('opacity-0');
-            modal.querySelector('div').classList.add('scale-90');
-            setTimeout(() => modal.classList.add('hidden'), 300);
-        }
-
-        function openModal(id) {
-            const modal = document.getElementById(id);
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                modal.querySelector('div').classList.remove('scale-90');
-                modal.querySelector('div').classList.add('scale-100');
-            }, 20);
-        }
-
+        // REFACTORED TEMPLATES FOR EVENT VIEW
         function renderEventView() {
             const container = document.getElementById('event-dynamic-container');
             const events = appState.roles.events;
             
             if (!events || events.length === 0) {
-                container.innerHTML = `<div class="bg-white rounded-3xl border border-dashed border-slate-200 p-8 text-center flex flex-col items-center justify-center min-h-[40vh]"><div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 text-3xl mb-4"><i class="fa-regular fa-calendar-xmark"></i></div><h3 class="text-lg font-bold text-slate-700 mb-1">Belum Ada Amanah Event</h3><p class="text-slate-500 text-sm">Anda belum ditugaskan dalam event apapun.</p></div>`;
+                container.innerHTML = `<div class="glass-card p-8 text-center flex flex-col items-center justify-center min-h-[40vh] border-t-4 border-t-slate-300"><div class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-slate-300 text-3xl mb-4 shadow-sm border border-slate-100"><i class="fa-regular fa-calendar-xmark"></i></div><h3 class="text-lg font-black text-slate-700 mb-1">Belum Ada Amanah Event</h3><p class="text-slate-500 text-sm">Anda belum ditugaskan dalam event apapun.</p></div>`;
                 return;
             }
 
@@ -748,37 +880,37 @@
                             let encodedTasks = encodeURIComponent(JSON.stringify(divTasks));
                             
                             panitiaHtml += `
-                                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 shadow-sm relative group cursor-pointer hover:border-awBlue transition-colors" onclick="showDivisiDetail('${div}', '${encodedTasks}')">
+                                <div class="bg-white/80 border border-white rounded-2xl p-4 shadow-sm relative group cursor-pointer hover:border-aw-blue hover:shadow-md transition-all" onclick="showDivisiDetail('${div}', '${encodedTasks}')">
                                     <div class="flex justify-between items-start mb-2">
-                                        <h4 class="font-bold text-slate-700">${div}</h4>
-                                        <span class="text-xs font-bold px-2 py-1 rounded-md ${is100 ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-200 text-slate-600'}">${pct}%</span>
+                                        <h4 class="font-black text-slate-700 text-sm">${div}</h4>
+                                        <span class="text-[10px] font-black px-2 py-0.5 rounded-md uppercase ${is100 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'}">${pct}%</span>
                                     </div>
-                                    <div class="w-full bg-slate-200 rounded-full h-1.5 mb-2"><div class="${is100 ? 'bg-emerald-500' : 'bg-awBlue'} h-1.5 rounded-full" style="width: ${pct}%"></div></div>
-                                    <p class="text-[10px] text-slate-400 font-medium mb-3">${doneTasks} dari ${divTasks.length} tugas selesai</p>
-                                    ${is100 ? `<button onclick="event.stopPropagation(); triggerScoreEvent('${ev.title}', '${div}')" class="w-full py-1.5 text-xs font-bold bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors"><i class="fa-solid fa-star mr-1"></i> Beri Nilai</button>` : `<div class="w-full py-1.5 text-xs font-bold bg-slate-200 text-slate-500 rounded-lg text-center">Tugas Belum Tuntas</div>`}
+                                    <div class="w-full bg-slate-200 rounded-full h-1.5 mb-2"><div class="${is100 ? 'bg-aw-green' : 'bg-aw-blue'} h-1.5 rounded-full" style="width: ${pct}%"></div></div>
+                                    <p class="text-[10px] font-bold text-slate-400 mb-3">${doneTasks} dari ${divTasks.length} tugas selesai</p>
+                                    ${is100 ? `<button onclick="event.stopPropagation(); triggerScoreEvent('${ev.title}', '${div}')" class="w-full py-2 text-[10px] font-black bg-amber-100 text-amber-700 rounded-xl hover:bg-amber-200 transition-colors uppercase tracking-wider"><i class="fa-solid fa-star mr-1"></i> Beri Nilai</button>` : `<div class="w-full py-2 text-[10px] font-black bg-slate-100 text-slate-400 rounded-xl text-center uppercase tracking-wider border border-slate-200">Belum Tuntas</div>`}
                                 </div>
                             `;
                         });
                     }
                     html += `
-                        <div class="bg-white rounded-3xl shadow-soft border border-slate-100 p-6 sm:p-8 relative overflow-hidden">
-                            <p class="text-xs font-bold text-awBlue uppercase tracking-widest mb-2 flex items-center gap-2"><i class="fa-solid fa-crown text-amber-500"></i> Ketua Event</p>
-                            <h3 class="text-2xl font-extrabold text-slate-800 mb-4">${ev.title}</h3>
+                        <div class="glass-card p-6 md:p-8 relative overflow-hidden border-t-4 border-t-aw-yellow">
+                            <p class="text-xs font-bold text-aw-yellow uppercase tracking-widest mb-2 flex items-center gap-2"><i class="fa-solid fa-crown"></i> Ketua Event</p>
+                            <h3 class="text-xl md:text-2xl font-black text-slate-800 mb-5">${ev.title}</h3>
                             
-                            <div class="mb-6">
-                                <div class="flex justify-between items-center mb-3">
-                                    <h4 class="text-sm font-bold text-slate-500 uppercase tracking-widest">Pantau Divisi</h4>
-                                    <button onclick="document.getElementById('event-form-area-${idx}').classList.toggle('hidden')" class="text-xs px-3 py-1.5 bg-awBlueLight text-awBlue font-bold rounded-lg hover:bg-blue-200 transition-colors"><i class="fa-solid fa-user-plus mr-1"></i> Kepanitiaan</button>
+                            <div class="mb-2">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest bg-slate-100 px-3 py-1 rounded">Pantau Divisi</h4>
+                                    <button onclick="document.getElementById('event-form-area-${idx}').classList.toggle('hidden')" class="text-[10px] px-3 py-1.5 bg-blue-50 text-aw-blue font-bold rounded-lg hover:bg-blue-100 transition-colors border border-blue-200 uppercase tracking-wider"><i class="fa-solid fa-user-plus mr-1"></i> Kepanitiaan</button>
                                 </div>
-                                <div id="event-form-area-${idx}" class="hidden mb-4 p-4 bg-slate-50 border border-slate-200 rounded-2xl">
+                                <div id="event-form-area-${idx}" class="hidden mb-6 p-5 bg-slate-50/50 border border-slate-200 rounded-2xl shadow-inner">
                                      <p class="text-xs text-slate-500 mb-3 font-medium">Susun divisi dan pilih guru dari dropdown.</p>
                                      <form onsubmit="submitCommittee(event, '${ev.title}', ${idx})">
                                         <div id="committee-rows-container-${idx}" class="space-y-3 mb-4">${getCommitteeRowHTML()}</div>
-                                        <button type="button" onclick="tambahBarisPanitia(${idx})" class="text-xs font-bold text-awBlue bg-white border border-blue-100 px-3 py-2 rounded-lg mb-4 hover:bg-blue-50">+ Tambah Anggota / Divisi</button>
-                                        <button type="submit" id="btn-submit-committee-${idx}" class="w-full px-6 py-2.5 bg-awDark text-white text-sm font-bold rounded-xl shadow-md flex items-center justify-center gap-2"><span>Simpan Panitia</span></button>
+                                        <button type="button" onclick="tambahBarisPanitia(${idx})" class="text-[10px] font-black uppercase text-aw-blue bg-white border border-blue-100 px-4 py-2.5 rounded-xl mb-4 hover:bg-blue-50 transition shadow-sm">+ Tambah Divisi</button>
+                                        <button type="submit" id="btn-submit-committee-${idx}" class="w-full px-6 py-3 bg-aw-navy text-white text-sm font-bold rounded-xl shadow-md flex items-center justify-center gap-2 transition hover:bg-blue-900"><span>Simpan Panitia</span></button>
                                      </form>
                                 </div>
-                                ${panitiaHtml ? `<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">${panitiaHtml}</div>` : `<p class="text-xs text-slate-400 italic">Belum ada panitia yang dibentuk.</p>`}
+                                ${panitiaHtml ? `<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">${panitiaHtml}</div>` : `<p class="text-xs text-slate-400 italic bg-slate-50 p-4 rounded-xl text-center border border-dashed border-slate-200">Belum ada panitia yang dibentuk.</p>`}
                             </div>
                         </div>
                     `;
@@ -790,13 +922,13 @@
                     if (tasks.length === 0) {
                         cardsHtml = `
                             <div class="col-span-full">
-                                <p class="text-sm text-slate-500 mt-2 mb-4">Anda belum membuat rencana Action Plan.</p>
-                                <button onclick="document.getElementById('event-ap-area-${idx}').classList.toggle('hidden')" class="px-5 py-2 text-sm bg-awBlue text-white font-bold rounded-xl shadow-md hover:bg-blue-800 transition-all">Buat Action Plan</button>
-                                <div id="event-ap-area-${idx}" class="hidden mt-4 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                                <p class="text-sm text-slate-500 mb-4 bg-amber-50 border border-amber-100 p-3 rounded-xl text-amber-800">Anda belum membuat rencana Action Plan untuk divisi ini.</p>
+                                <button onclick="document.getElementById('event-ap-area-${idx}').classList.toggle('hidden')" class="px-5 py-2.5 text-xs bg-aw-blue text-white font-bold rounded-xl shadow-md hover:bg-blue-700 transition-all">Buat Action Plan</button>
+                                <div id="event-ap-area-${idx}" class="hidden mt-4 p-5 bg-slate-50/50 rounded-2xl border border-slate-200 shadow-inner">
                                      <form onsubmit="submitNewActionPlan(event, '${ev.title}', '${ev.divisi}', ${idx})">
                                         <div id="actionplan-rows-container-${idx}" class="space-y-3 mb-4">${getActionPlanRowHTML()}</div>
-                                        <button type="button" onclick="tambahBarisActionPlan(${idx})" class="text-xs font-bold text-awBlue bg-white px-3 py-2 border border-blue-100 rounded-lg mb-4">+ Tambah Tugas</button>
-                                        <button type="submit" id="btn-submit-actionplan-${idx}" class="w-full py-2.5 bg-emerald-500 text-white font-bold rounded-xl shadow-md flex items-center justify-center gap-2"><span>Kirim Tugas</span></button>
+                                        <button type="button" onclick="tambahBarisActionPlan(${idx})" class="text-[10px] font-black uppercase text-aw-blue bg-white px-4 py-2.5 border border-blue-100 rounded-xl mb-4 shadow-sm hover:bg-blue-50 transition">+ Tambah Tugas</button>
+                                        <button type="submit" id="btn-submit-actionplan-${idx}" class="w-full py-3 bg-aw-green text-white font-bold rounded-xl shadow-md flex items-center justify-center gap-2 transition hover:bg-emerald-600"><span>Simpan Rencana Tugas</span></button>
                                      </form>
                                 </div>
                             </div>
@@ -806,10 +938,10 @@
                         let progressPct = Math.round((completedTasks / tasks.length) * 100);
                         
                         progressUI = `
-                            <div class="mb-6 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                                <div class="flex justify-between text-sm font-bold mb-2"><span class="text-slate-600">Progress Divisi</span><span class="${progressPct === 100 ? 'text-emerald-600' : 'text-awBlue'}">${progressPct}%</span></div>
-                                <div class="w-full bg-slate-200 rounded-full h-2.5"><div class="${progressPct === 100 ? 'bg-emerald-500' : 'bg-awBlue'} h-2.5 rounded-full transition-all" style="width: ${progressPct}%"></div></div>
-                                <p class="text-[10px] sm:text-xs font-medium text-slate-400 mt-2">${completedTasks} dari ${tasks.length} tugas diselesaikan</p>
+                            <div class="mb-6 bg-white/60 p-4 rounded-2xl border border-white shadow-sm">
+                                <div class="flex justify-between text-[11px] uppercase tracking-wider font-black mb-2"><span class="text-slate-500">Progress Divisi</span><span class="${progressPct === 100 ? 'text-aw-green' : 'text-aw-blue'}">${progressPct}%</span></div>
+                                <div class="w-full bg-slate-200 rounded-full h-2.5"><div class="${progressPct === 100 ? 'bg-aw-green' : 'bg-aw-blue'} h-2.5 rounded-full transition-all" style="width: ${progressPct}%"></div></div>
+                                <p class="text-[10px] font-bold text-slate-400 mt-2 text-right">${completedTasks} dari ${tasks.length} diselesaikan</p>
                             </div>
                         `;
 
@@ -818,25 +950,23 @@
                             let fileInputId = `ap-proof-${idx}-${tIdx}`;
                             
                             cardsHtml += `
-                                <div class="bg-slate-50 border ${isDone ? 'border-emerald-200' : 'border-slate-200'} rounded-2xl p-4 sm:p-5 shadow-sm transition-all relative overflow-hidden group">
-                                    ${isDone ? '<div class="absolute right-0 top-0 w-20 h-20 bg-emerald-400 opacity-10 rounded-full blur-xl"></div>' : ''}
+                                <div class="bg-white/80 border ${isDone ? 'border-emerald-200 bg-emerald-50/30' : 'border-slate-200'} rounded-2xl p-4 sm:p-5 shadow-sm relative overflow-hidden">
                                     <div class="flex justify-between items-start mb-2">
-                                        <h4 class="font-bold text-slate-700 text-sm sm:text-base pr-4 leading-tight">${task.rencana_tugas}</h4>
-                                        <span class="shrink-0 ${isDone ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'} w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm"><i class="fa-solid ${isDone ? 'fa-check' : 'fa-xmark'}"></i></span>
+                                        <h4 class="font-bold text-slate-800 text-sm leading-tight pr-4">${task.rencana_tugas}</h4>
+                                        <span class="shrink-0 ${isDone ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'} w-7 h-7 rounded-full flex items-center justify-center font-black text-xs border border-white shadow-sm"><i class="fa-solid ${isDone ? 'fa-check' : 'fa-xmark'}"></i></span>
                                     </div>
-                                    <p class="text-[10px] sm:text-xs font-semibold text-slate-500 mb-3"><i class="fa-regular fa-calendar mr-1"></i> Deadline: ${task.deadline}</p>
+                                    <p class="text-[10px] sm:text-xs font-bold text-slate-400 mb-3"><i class="fa-regular fa-calendar mr-1"></i> TDL: ${task.deadline}</p>
                                     
                                     ${!isDone ? `
-                                        <div class="mt-3 pt-3 border-t border-slate-200">
-                                            <p class="text-[10px] font-bold text-slate-500 mb-1.5 uppercase">Upload Bukti</p>
-                                            <div class="flex gap-2">
-                                                <input type="file" id="${fileInputId}" class="flex-1 text-[10px] sm:text-xs border border-slate-200 rounded-lg p-1.5 bg-white file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-[10px] file:font-semibold file:bg-awBlueLight file:text-awBlue hover:file:bg-blue-100 cursor-pointer" accept="image/*,.pdf">
-                                                <button onclick="uploadActionPlanProof(this, '${ev.title}', '${ev.divisi}', '${task.rencana_tugas}', '${fileInputId}')" class="bg-awBlue text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-blue-800 transition-colors min-w-[70px]">Upload</button>
+                                        <div class="mt-4 pt-3 border-t border-slate-100">
+                                            <div class="flex flex-col sm:flex-row gap-2">
+                                                <input type="file" id="${fileInputId}" class="flex-1 text-[10px] border border-slate-200 rounded-xl p-1.5 bg-slate-50 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-blue-100 file:text-blue-700 cursor-pointer" accept="image/*,.pdf">
+                                                <button onclick="uploadActionPlanProof(this, '${ev.title}', '${ev.divisi}', '${task.rencana_tugas}', '${fileInputId}')" class="bg-aw-navy text-white text-[10px] uppercase tracking-wider font-black px-4 py-2 rounded-xl hover:bg-blue-800 transition-colors">Upload</button>
                                             </div>
                                         </div>
                                     ` : `
-                                        <div class="mt-3 pt-2 border-t border-emerald-100">
-                                            <a href="${task.link_bukti}" target="_blank" class="text-[10px] sm:text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1"><i class="fa-solid fa-paperclip"></i> Lihat Bukti Terlampir</a>
+                                        <div class="mt-4 pt-3 border-t border-emerald-100/50">
+                                            <a href="${task.link_bukti}" target="_blank" class="text-[10px] sm:text-xs font-black uppercase tracking-wider text-emerald-600 hover:text-emerald-700 flex items-center gap-1.5"><i class="fa-solid fa-link"></i> Bukti Lampiran</a>
                                         </div>
                                     `}
                                 </div>
@@ -845,9 +975,9 @@
                     }
 
                     html += `
-                        <div class="bg-white rounded-3xl shadow-soft border border-slate-100 p-6 sm:p-8 relative overflow-hidden">
-                            <p class="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-1 flex items-center gap-2"><i class="fa-solid fa-users text-emerald-500"></i> Divisi ${ev.divisi}</p>
-                            <h3 class="text-xl sm:text-2xl font-extrabold text-slate-800 mb-6">${ev.title}</h3>
+                        <div class="glass-card p-6 md:p-8 relative overflow-hidden border-t-4 border-t-aw-green">
+                            <p class="text-[10px] font-black text-aw-green uppercase tracking-widest mb-1 flex items-center gap-2 bg-emerald-50 w-fit px-3 py-1 rounded border border-emerald-100"><i class="fa-solid fa-users"></i> Divisi ${ev.divisi}</p>
+                            <h3 class="text-xl md:text-2xl font-black text-slate-800 mb-5 mt-2">${ev.title}</h3>
                             ${progressUI}
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">${cardsHtml}</div>
                         </div>
@@ -857,12 +987,13 @@
             container.innerHTML = html;
         }
 
+        // REFACTORED TEMPLATES FOR COMMISSION VIEW
         function renderCommissionView() {
             const container = document.getElementById('comm-dynamic-container');
             const comms = appState.roles.commissions;
             
             if (!comms || comms.length === 0) {
-                container.innerHTML = `<div class="bg-white rounded-3xl border border-dashed border-slate-200 p-8 text-center flex flex-col items-center justify-center min-h-[40vh]"><div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 text-3xl mb-4"><i class="fa-solid fa-shield-cat"></i></div><h3 class="text-lg font-bold text-slate-700 mb-1">Belum Ada Amanah Komisi</h3><p class="text-slate-500 text-sm">Anda belum tergabung dalam program komisi.</p></div>`;
+                container.innerHTML = `<div class="glass-card p-8 text-center flex flex-col items-center justify-center min-h-[40vh] border-t-4 border-t-slate-300"><div class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-slate-300 text-3xl mb-4 shadow-sm border border-slate-100"><i class="fa-solid fa-shield-cat"></i></div><h3 class="text-lg font-black text-slate-700 mb-1">Belum Ada Amanah Komisi</h3><p class="text-slate-500 text-sm">Anda belum tergabung dalam program komisi.</p></div>`;
                 return;
             }
 
@@ -879,37 +1010,37 @@
                             let encodedHist = encodeURIComponent(JSON.stringify(progHistory));
                             
                             progHtml += `
-                                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 shadow-sm relative group cursor-pointer hover:border-indigo-400 transition-colors" onclick="showProgramDetail('${p.nama_program}', '${p.pic_guru}', '${encodedHist}')">
-                                    <h4 class="font-bold text-slate-700 text-sm mb-1 line-clamp-1">${p.nama_program}</h4>
-                                    <p class="text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-3"><i class="fa-solid fa-user-tie mr-1"></i> ${p.pic_guru}</p>
+                                <div class="bg-white/80 border border-white rounded-2xl p-4 shadow-sm relative group cursor-pointer hover:border-indigo-300 hover:shadow-md transition-all" onclick="showProgramDetail('${p.nama_program}', '${p.pic_guru}', '${encodedHist}')">
+                                    <h4 class="font-black text-slate-700 text-sm mb-1 line-clamp-1">${p.nama_program}</h4>
+                                    <p class="text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-3 bg-indigo-50 inline-block px-2 py-0.5 rounded border border-indigo-100"><i class="fa-solid fa-user-tie mr-1"></i> ${p.pic_guru}</p>
                                     
-                                    <div class="flex justify-between text-[10px] font-bold mb-1"><span class="text-slate-500">Progress</span><span class="${pct===100?'text-emerald-600':'text-indigo-600'}">${pct}%</span></div>
-                                    <div class="w-full bg-slate-200 rounded-full h-1.5 mb-2"><div class="${pct===100?'bg-emerald-500':'bg-indigo-500'} h-1.5 rounded-full" style="width: ${pct}%"></div></div>
-                                    <p class="text-[10px] text-slate-400 font-medium mb-3">${filesCount} file laporan disetor.</p>
+                                    <div class="flex justify-between text-[10px] font-black uppercase mb-1"><span class="text-slate-400">Target Report</span><span class="${pct===100?'text-aw-green':'text-indigo-600'}">${pct}%</span></div>
+                                    <div class="w-full bg-slate-200 rounded-full h-1.5 mb-2"><div class="${pct===100?'bg-aw-green':'bg-indigo-500'} h-1.5 rounded-full" style="width: ${pct}%"></div></div>
+                                    <p class="text-[10px] text-slate-400 font-bold mb-4">${filesCount} file disetor.</p>
                                     
-                                    ${isUnlocked ? `<button onclick="event.stopPropagation(); triggerScoreComm('${cm.title}', '${p.nama_program}', '${p.pic_guru}')" class="w-full py-1.5 text-xs font-bold bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors"><i class="fa-solid fa-star mr-1"></i> Beri Nilai</button>` : `<div class="w-full py-1.5 text-[10px] font-bold bg-slate-200 text-slate-400 rounded-lg text-center uppercase tracking-wider"><i class="fa-solid fa-lock mr-1"></i> Butuh 6 File</div>`}
+                                    ${isUnlocked ? `<button onclick="event.stopPropagation(); triggerScoreComm('${cm.title}', '${p.nama_program}', '${p.pic_guru}')" class="w-full py-2 text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-700 rounded-xl hover:bg-amber-200 transition-colors"><i class="fa-solid fa-star mr-1"></i> Beri Nilai</button>` : `<div class="w-full py-2 text-[9px] font-black bg-slate-100 text-slate-400 rounded-xl text-center uppercase tracking-widest border border-slate-200"><i class="fa-solid fa-lock mr-1"></i> Butuh 6 File</div>`}
                                 </div>
                             `;
                         });
                     }
                     html += `
-                        <div class="bg-white rounded-3xl shadow-soft border border-slate-100 p-6 sm:p-8 relative overflow-hidden">
-                            <p class="text-xs font-bold text-indigo-600 uppercase tracking-widest mb-2 flex items-center gap-2"><i class="fa-solid fa-shield-halved text-indigo-400"></i> Ketua Komisi</p>
-                            <h3 class="text-xl sm:text-2xl font-extrabold text-slate-800 mb-6">${cm.title}</h3>
+                        <div class="glass-card p-6 md:p-8 relative overflow-hidden border-t-4 border-t-indigo-500">
+                            <p class="text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-2 flex items-center gap-2"><i class="fa-solid fa-shield-halved text-indigo-400"></i> Ketua Komisi</p>
+                            <h3 class="text-xl md:text-2xl font-black text-slate-800 mb-5">${cm.title}</h3>
                             
-                            <div class="mb-6">
-                                <div class="flex justify-between items-center mb-3">
-                                    <h4 class="text-sm font-bold text-slate-500 uppercase tracking-widest">Daftar Program</h4>
-                                    <button onclick="document.getElementById('comm-form-area-${idx}').classList.toggle('hidden')" class="text-xs px-3 py-1.5 bg-indigo-50 text-indigo-600 font-bold rounded-lg hover:bg-indigo-100 transition-colors"><i class="fa-solid fa-plus mr-1"></i> Rancang Program</button>
+                            <div class="mb-2">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest bg-slate-100 px-3 py-1 rounded">Daftar Program</h4>
+                                    <button onclick="document.getElementById('comm-form-area-${idx}').classList.toggle('hidden')" class="text-[10px] px-3 py-1.5 bg-indigo-50 text-indigo-700 font-bold rounded-lg hover:bg-indigo-100 transition-colors border border-indigo-200 uppercase tracking-wider"><i class="fa-solid fa-plus mr-1"></i> Program</button>
                                 </div>
-                                <div id="comm-form-area-${idx}" class="hidden mb-4 p-4 bg-slate-50 border border-slate-200 rounded-2xl">
+                                <div id="comm-form-area-${idx}" class="hidden mb-6 p-5 bg-slate-50/50 border border-slate-200 rounded-2xl shadow-inner">
                                      <form onsubmit="submitProgram(event, '${cm.title}', ${idx})">
                                         <div id="program-rows-container-${idx}" class="space-y-3 mb-4">${getProgramRowHTML()}</div>
-                                        <button type="button" onclick="tambahBarisProgram(${idx})" class="text-xs font-bold text-indigo-600 bg-white border border-indigo-100 px-3 py-2 rounded-lg mb-4 hover:bg-indigo-50">+ Tambah Program</button>
-                                        <button type="submit" id="btn-submit-program-${idx}" class="w-full px-6 py-2.5 bg-awDark text-white text-sm font-bold rounded-xl shadow-md flex justify-center gap-2"><span>Simpan Program</span></button>
+                                        <button type="button" onclick="tambahBarisProgram(${idx})" class="text-[10px] font-black text-indigo-600 uppercase tracking-wider bg-white border border-indigo-100 px-4 py-2.5 rounded-xl mb-4 hover:bg-indigo-50 shadow-sm">+ Tambah</button>
+                                        <button type="submit" id="btn-submit-program-${idx}" class="w-full px-6 py-3 bg-aw-navy text-white text-sm font-bold rounded-xl shadow-md flex justify-center gap-2 transition hover:bg-blue-900"><span>Simpan Program</span></button>
                                      </form>
                                 </div>
-                                ${progHtml ? `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">${progHtml}</div>` : `<p class="text-xs text-slate-400 italic">Belum ada program dirancang.</p>`}
+                                ${progHtml ? `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">${progHtml}</div>` : `<p class="text-xs text-slate-400 italic bg-slate-50 p-4 rounded-xl text-center border border-dashed border-slate-200">Belum ada program dirancang.</p>`}
                             </div>
                         </div>
                     `;
@@ -922,52 +1053,52 @@
                             let tglStr = new Date(h.created_at).toLocaleDateString();
                             timelineHtml += `
                                 <div class="relative pl-6 sm:pl-8 py-3 group">
-                                    <div class="absolute left-0 top-4 w-3 h-3 bg-awBlue rounded-full border-2 border-white shadow-sm z-10"></div>
+                                    <div class="absolute left-0 top-4 w-3 h-3 bg-aw-blue rounded-full border-2 border-white shadow-sm z-10"></div>
                                     ${i !== history.length - 1 ? '<div class="absolute left-1.5 top-5 w-0.5 h-full bg-blue-100 -z-0"></div>' : ''}
-                                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 sm:p-4 shadow-sm hover:shadow-md transition-shadow">
+                                    <div class="bg-white/80 border border-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
                                         <div class="flex justify-between items-start">
                                             <div>
-                                                <h4 class="font-bold text-slate-700 text-sm">${h.keterangan}</h4>
-                                                <p class="text-[10px] sm:text-xs text-slate-400 font-medium mt-0.5"><i class="fa-regular fa-clock mr-1"></i> ${tglStr}</p>
+                                                <h4 class="font-bold text-slate-700 text-sm leading-tight">${h.keterangan}</h4>
+                                                <p class="text-[10px] sm:text-xs text-slate-400 font-bold mt-1 uppercase tracking-wide"><i class="fa-regular fa-clock mr-1"></i> ${tglStr}</p>
                                             </div>
-                                            <a href="${h.link_file_foto}" target="_blank" class="w-8 h-8 bg-blue-100 text-awBlue rounded-lg flex items-center justify-center hover:bg-awBlue hover:text-white transition-colors" title="Lihat Lampiran"><i class="fa-solid fa-paperclip"></i></a>
+                                            <a href="${h.link_file_foto}" target="_blank" class="w-8 h-8 bg-blue-50 border border-blue-100 text-aw-blue rounded-xl flex items-center justify-center hover:bg-aw-blue hover:text-white transition-colors shrink-0" title="Lihat Lampiran"><i class="fa-solid fa-paperclip"></i></a>
                                         </div>
                                     </div>
                                 </div>
                             `;
                         });
                     } else {
-                        timelineHtml = `<div class="text-center py-6 text-sm text-slate-400 font-medium italic bg-slate-50 rounded-xl border border-dashed border-slate-200">Belum ada histori laporan.</div>`;
+                        timelineHtml = `<div class="text-center py-6 text-sm text-slate-400 font-medium italic bg-white/50 rounded-2xl border border-dashed border-slate-300">Belum ada histori laporan.</div>`;
                     }
 
                     html += `
-                        <div class="bg-white rounded-3xl shadow-soft border border-slate-100 p-6 sm:p-8 relative">
-                            <p class="text-xs font-bold text-awOrange uppercase tracking-widest mb-1 flex items-center gap-2"><i class="fa-solid fa-bolt text-orange-400"></i> PIC Program</p>
-                            <h3 class="text-xl sm:text-2xl font-extrabold text-slate-800 mb-1">${cm.program}</h3>
-                            <p class="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 border-b border-slate-100 pb-4">Komisi: <span class="text-slate-600">${cm.title}</span></p>
+                        <div class="glass-card p-6 md:p-8 relative border-t-4 border-t-aw-orange">
+                            <p class="text-[10px] font-black text-aw-orange uppercase tracking-widest mb-1 flex items-center gap-2"><i class="fa-solid fa-bolt text-orange-400"></i> PIC Program</p>
+                            <h3 class="text-xl md:text-2xl font-black text-slate-800 mb-1">${cm.program}</h3>
+                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-6 border-b border-slate-100/50 pb-4">Komisi: <span class="text-slate-700">${cm.title}</span></p>
                             
                             <div class="flex flex-col md:flex-row gap-6 sm:gap-8">
                                 <div class="flex-1 order-2 md:order-1">
-                                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Histori Laporan</h4>
+                                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 bg-slate-100 px-3 py-1 rounded w-fit">Histori Laporan</h4>
                                     <div class="relative">${timelineHtml}</div>
                                 </div>
                                 <div class="md:w-1/3 shrink-0 order-1 md:order-2">
-                                    <div class="bg-slate-800 rounded-2xl p-5 sm:p-6 text-white shadow-lg md:sticky md:top-24">
-                                        <h4 class="font-bold text-sm sm:text-base mb-4 flex items-center gap-2"><i class="fa-solid fa-cloud-arrow-up text-blue-400"></i> Laporan Baru</h4>
+                                    <div class="bg-gradient-to-b from-aw-navy to-blue-900 rounded-3xl p-5 sm:p-6 text-white shadow-xl md:sticky md:top-24 border border-blue-800">
+                                        <h4 class="font-black text-sm sm:text-base mb-5 flex items-center gap-2 border-b border-white/10 pb-3"><i class="fa-solid fa-cloud-arrow-up text-aw-yellow"></i> Setor Laporan Baru</h4>
                                         <form onsubmit="submitNewCommProgress(event, '${cm.program}', ${idx})">
                                             <div class="mb-4">
-                                                <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 mb-1.5 uppercase">Keterangan</label>
-                                                <input type="text" id="inp-comm-ket-${idx}" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-blue-500" placeholder="Cth: Laporan Pekan 1" required>
+                                                <label class="block text-[10px] font-bold text-blue-200 mb-1.5 uppercase tracking-wider">Keterangan Singkat</label>
+                                                <input type="text" id="inp-comm-ket-${idx}" class="w-full bg-white/10 border border-white/20 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-aw-yellow transition-colors placeholder-blue-300" placeholder="Cth: Laporan Pekan 1" required>
                                             </div>
                                             <div class="mb-6">
-                                                <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 mb-1.5 uppercase">Lampiran (Foto/PDF)</label>
-                                                <div class="border-2 border-dashed border-slate-600 rounded-xl p-4 text-center hover:border-blue-500 transition-colors cursor-pointer bg-slate-900/50" onclick="document.getElementById('comm-file-upload-${idx}').click()">
-                                                    <i class="fa-solid fa-file-arrow-up text-xl sm:text-2xl text-slate-500 mb-2"></i>
-                                                    <p id="comm-file-name-${idx}" class="text-[10px] sm:text-xs text-slate-400 font-medium break-words">Klik pilih file</p>
+                                                <label class="block text-[10px] font-bold text-blue-200 mb-1.5 uppercase tracking-wider">Lampiran File (PDF/IMG)</label>
+                                                <div class="border-2 border-dashed border-white/20 rounded-xl p-5 text-center hover:border-aw-yellow transition-colors cursor-pointer bg-black/10" onclick="document.getElementById('comm-file-upload-${idx}').click()">
+                                                    <i class="fa-solid fa-file-arrow-up text-2xl text-blue-300 mb-2"></i>
+                                                    <p id="comm-file-name-${idx}" class="text-[10px] text-blue-200 font-bold uppercase tracking-wider break-words">Klik Pilih File</p>
                                                     <input type="file" id="comm-file-upload-${idx}" class="hidden" accept="image/*,.pdf" onchange="document.getElementById('comm-file-name-${idx}').innerText = this.files[0].name" required>
                                                 </div>
                                             </div>
-                                            <button type="submit" id="btn-submit-comm-prog-${idx}" class="w-full py-2.5 sm:py-3 bg-awBlue hover:bg-blue-600 text-white text-sm font-bold rounded-xl shadow-md transition-colors flex items-center justify-center gap-2"><span>Kirim Laporan</span></button>
+                                            <button type="submit" id="btn-submit-comm-prog-${idx}" class="w-full py-3 bg-aw-yellow hover:bg-amber-500 text-aw-navy text-sm font-black rounded-xl shadow-lg transition-colors flex items-center justify-center gap-2"><span>Kirim Laporan</span></button>
                                         </form>
                                     </div>
                                 </div>
@@ -979,7 +1110,7 @@
             container.innerHTML = html;
         }
 
-        // Helper Forms
+        // --- FORM HELPERS ---
         function getTeacherDropdownOptions() {
             let opts = `<option value="">Pilih Guru...</option>`;
             appState.teacherList.forEach(t => { opts += `<option value="${t}">${t}</option>`; });
@@ -987,15 +1118,15 @@
         }
 
         function getActionPlanRowHTML() { 
-            return `<div class="flex flex-col sm:flex-row gap-2 ap-row items-start sm:items-center bg-white p-2 sm:p-3 rounded-xl border border-slate-200"><input type="text" class="ap-task w-full border border-slate-200 rounded-lg p-2 text-xs font-medium" placeholder="Rencana tugas..." required><input type="date" class="ap-date w-full sm:w-auto border border-slate-200 rounded-lg p-2 text-xs font-medium text-slate-600" required><button type="button" onclick="this.closest('.ap-row').remove()" class="w-full sm:w-8 h-8 bg-slate-50 border border-slate-200 text-slate-400 hover:text-red-500 rounded-lg"><i class="fa-solid fa-trash text-xs"></i></button></div>`; 
+            return `<div class="flex flex-col sm:flex-row gap-2 ap-row items-start sm:items-center bg-white p-2 sm:p-3 rounded-xl border border-slate-200 shadow-sm"><input type="text" class="ap-task w-full border border-slate-200 rounded-lg p-2.5 text-xs font-medium focus:border-aw-blue outline-none transition" placeholder="Rencana tugas..." required><input type="date" class="ap-date w-full sm:w-auto border border-slate-200 rounded-lg p-2.5 text-xs font-bold text-slate-600 outline-none focus:border-aw-blue transition" required><button type="button" onclick="this.closest('.ap-row').remove()" class="w-full sm:w-10 h-10 bg-red-50 border border-red-100 text-red-400 hover:text-white hover:bg-red-500 transition rounded-lg shrink-0"><i class="fa-solid fa-trash text-sm"></i></button></div>`; 
         }
         
         function getCommitteeRowHTML() { 
-            return `<div class="flex flex-col sm:flex-row gap-2 comm-row items-start sm:items-center bg-white p-2 sm:p-3 rounded-xl border border-slate-200"><input type="text" class="comm-div w-full sm:w-1/3 border border-slate-200 rounded-lg p-2 text-xs font-medium" placeholder="Nama Divisi" required><select class="comm-guru w-full border border-slate-200 rounded-lg p-2 text-xs font-medium text-slate-700 bg-white" required>${getTeacherDropdownOptions()}</select><button type="button" onclick="this.closest('.comm-row').remove()" class="w-full sm:w-8 h-8 bg-slate-50 border border-slate-200 text-slate-400 hover:text-red-500 rounded-lg"><i class="fa-solid fa-trash text-xs"></i></button></div>`; 
+            return `<div class="flex flex-col sm:flex-row gap-2 comm-row items-start sm:items-center bg-white p-2 sm:p-3 rounded-xl border border-slate-200 shadow-sm"><input type="text" class="comm-div w-full sm:w-1/3 border border-slate-200 rounded-lg p-2.5 text-xs font-medium focus:border-aw-blue outline-none transition" placeholder="Nama Divisi" required><select class="comm-guru w-full border border-slate-200 rounded-lg p-2.5 text-xs font-bold text-slate-700 bg-slate-50 outline-none focus:border-aw-blue transition" required>${getTeacherDropdownOptions()}</select><button type="button" onclick="this.closest('.comm-row').remove()" class="w-full sm:w-10 h-10 bg-red-50 border border-red-100 text-red-400 hover:text-white hover:bg-red-500 transition rounded-lg shrink-0"><i class="fa-solid fa-trash text-sm"></i></button></div>`; 
         }
 
         function getProgramRowHTML() { 
-            return `<div class="flex flex-col sm:flex-row gap-2 comm-prog-row items-start sm:items-center bg-white p-2 sm:p-3 rounded-xl border border-slate-200"><input type="text" class="prog-name w-full sm:w-1/2 border border-slate-200 rounded-lg p-2 text-xs font-medium" placeholder="Nama Program" required><select class="prog-pic w-full border border-slate-200 rounded-lg p-2 text-xs font-medium text-slate-700 bg-white" required>${getTeacherDropdownOptions()}</select><button type="button" onclick="this.closest('.comm-prog-row').remove()" class="w-full sm:w-8 h-8 bg-slate-50 border border-slate-200 text-slate-400 hover:text-red-500 rounded-lg"><i class="fa-solid fa-trash text-xs"></i></button></div>`; 
+            return `<div class="flex flex-col sm:flex-row gap-2 comm-prog-row items-start sm:items-center bg-white p-2 sm:p-3 rounded-xl border border-slate-200 shadow-sm"><input type="text" class="prog-name w-full sm:w-1/2 border border-slate-200 rounded-lg p-2.5 text-xs font-medium focus:border-aw-blue outline-none transition" placeholder="Nama Program" required><select class="prog-pic w-full border border-slate-200 rounded-lg p-2.5 text-xs font-bold text-slate-700 bg-slate-50 outline-none focus:border-aw-blue transition" required>${getTeacherDropdownOptions()}</select><button type="button" onclick="this.closest('.comm-prog-row').remove()" class="w-full sm:w-10 h-10 bg-red-50 border border-red-100 text-red-400 hover:text-white hover:bg-red-500 transition rounded-lg shrink-0"><i class="fa-solid fa-trash text-sm"></i></button></div>`; 
         }
 
         window.tambahBarisPanitia = function(idx) { document.getElementById(`committee-rows-container-${idx}`).insertAdjacentHTML('beforeend', getCommitteeRowHTML()); }
@@ -1007,16 +1138,16 @@
             const content = document.getElementById('modal-content');
             document.getElementById('modal-title').innerText = `Detail Divisi ${divName}`;
             let html = '<div class="space-y-3">';
-            if(tasks.length === 0) html += '<p class="text-sm text-slate-500 italic">Belum ada tugas disubmit.</p>';
+            if(tasks.length === 0) html += '<p class="text-sm text-slate-500 italic text-center p-4">Belum ada tugas disubmit.</p>';
             tasks.forEach(t => {
                 let isDone = t.status === 'Selesai';
                 html += `
-                    <div class="p-3 border border-slate-200 rounded-xl bg-slate-50 flex justify-between items-center">
+                    <div class="p-4 border border-slate-200 rounded-2xl bg-white shadow-sm flex justify-between items-center text-left">
                         <div>
-                            <p class="font-bold text-sm text-slate-700">${t.rencana_tugas}</p>
-                            <p class="text-xs text-slate-500 mt-0.5"><i class="fa-regular fa-calendar mr-1"></i> ${t.deadline}</p>
+                            <p class="font-black text-sm text-slate-800">${t.rencana_tugas}</p>
+                            <p class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-wide"><i class="fa-regular fa-calendar mr-1"></i> ${t.deadline}</p>
                         </div>
-                        ${isDone ? `<a href="${t.link_bukti}" target="_blank" class="px-3 py-1.5 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-lg hover:bg-emerald-200"><i class="fa-solid fa-link mr-1"></i> Bukti</a>` : `<span class="px-2 py-1 bg-slate-200 text-slate-500 text-[10px] font-bold rounded uppercase">Pending</span>`}
+                        ${isDone ? `<a href="${t.link_bukti}" target="_blank" class="px-3 py-2 bg-emerald-50 border border-emerald-100 text-emerald-700 text-[10px] font-black rounded-lg hover:bg-emerald-100 transition uppercase tracking-wider shrink-0"><i class="fa-solid fa-link"></i> Bukti</a>` : `<span class="px-2 py-1 bg-slate-100 text-slate-400 text-[9px] font-black rounded uppercase border border-slate-200 shrink-0">Pending</span>`}
                     </div>`;
             });
             html += '</div>';
@@ -1027,18 +1158,18 @@
         window.showProgramDetail = function(progName, picName, encodedHist) {
             const hist = JSON.parse(decodeURIComponent(encodedHist));
             const content = document.getElementById('modal-content');
-            document.getElementById('modal-title').innerHTML = `Detail Program<br><span class="text-sm font-medium text-slate-500">${progName} - PIC: ${picName}</span>`;
+            document.getElementById('modal-title').innerHTML = `Detail Program<br><span class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1 block">${progName} - PIC: ${picName}</span>`;
             let html = '<div class="space-y-3">';
-            if(hist.length === 0) html += '<p class="text-sm text-slate-500 italic">Belum ada laporan disetor.</p>';
+            if(hist.length === 0) html += '<p class="text-sm text-slate-500 italic text-center p-4">Belum ada laporan disetor.</p>';
             hist.forEach(h => {
                 let tgl = new Date(h.created_at).toLocaleDateString();
                 html += `
-                    <div class="p-3 border border-slate-200 rounded-xl bg-slate-50 flex justify-between items-center">
+                    <div class="p-4 border border-slate-200 rounded-2xl bg-white shadow-sm flex justify-between items-center text-left">
                         <div>
-                            <p class="font-bold text-sm text-slate-700">${h.keterangan}</p>
-                            <p class="text-[10px] text-slate-500 mt-0.5"><i class="fa-regular fa-clock mr-1"></i> ${tgl}</p>
+                            <p class="font-black text-sm text-slate-800">${h.keterangan}</p>
+                            <p class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-wide"><i class="fa-regular fa-clock mr-1"></i> ${tgl}</p>
                         </div>
-                        <a href="${h.link_file_foto}" target="_blank" class="px-3 py-1.5 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-lg hover:bg-indigo-200"><i class="fa-solid fa-paperclip mr-1"></i> Lihat</a>
+                        <a href="${h.link_file_foto}" target="_blank" class="w-9 h-9 bg-blue-50 text-aw-blue text-sm rounded-xl flex items-center justify-center hover:bg-aw-blue hover:text-white transition-colors shrink-0"><i class="fa-solid fa-paperclip"></i></a>
                     </div>`;
             });
             html += '</div>';
@@ -1046,9 +1177,10 @@
             openModal('detail-modal');
         }
 
-        window.triggerScoreEvent = function(eventName, divName) { alert(`Form Penilaian Divisi ${divName} (Event: ${eventName}) akan segera dibuka.`); }
-        window.triggerScoreComm = function(commName, progName, picName) { alert(`Form Penilaian PIC ${picName} (Program: ${progName}) unlocked!`); }
+        window.triggerScoreEvent = function(eventName, divName) { showToast(`Form Penilaian Divisi ${divName} (Event: ${eventName}) akan segera dibuka.`, 'info'); }
+        window.triggerScoreComm = function(commName, progName, picName) { showToast(`Form Penilaian PIC ${picName} (Program: ${progName}) unlocked!`, 'info'); }
 
+        // --- SUBMIT DATA FUNCTIONS ---
         async function submitCommittee(e, namaEvent, idx) { 
             e.preventDefault(); 
             const form = e.target;
@@ -1080,10 +1212,9 @@
             if (!error) { showToast('Action Plan berhasil disimpan!', 'success'); loadTeacherRoles(); } 
             else showToast('Gagal menyimpan Action Plan', 'error');
             
-            btn.innerHTML = `<span>Kirim Tugas</span>`; btn.disabled = false;
+            btn.innerHTML = `<span>Simpan Rencana Tugas</span>`; btn.disabled = false;
         }
 
-        // Perbaikan Upload Event (Rencana Tugas & Public Bucket)
         async function uploadActionPlanProof(btnEl, eventName, divisi, rencanaTugas, inputId) {
             const fileInput = document.getElementById(inputId);
             if (!fileInput.files || fileInput.files.length === 0) { showToast('Pilih file bukti terlebih dahulu!', 'error'); return; }
@@ -1134,7 +1265,6 @@
             btn.innerHTML = `<span>Simpan Program</span>`; btn.disabled = false;
         }
 
-        // Perbaikan Upload Komisi (keterangan & Public Bucket)
         async function submitNewCommProgress(e, programName, idx) {
             e.preventDefault();
             const fileInput = document.getElementById(`comm-file-upload-${idx}`);
@@ -1170,6 +1300,7 @@
             }
         }
 
+        // --- SCANNER SYSTEM ---
         function setScanMode(mode) {
             appState.scanMode = mode;
             const btnIn = document.getElementById('btn-scan-in');
@@ -1177,12 +1308,12 @@
             const title = document.getElementById('scan-mode-title');
             
             if(mode === 'in') {
-                btnIn.className = "flex-1 py-3 text-xs sm:text-sm font-bold rounded-xl bg-slate-800 text-white shadow-md transition-all";
-                btnOut.className = "flex-1 py-3 text-xs sm:text-sm font-bold rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all";
+                btnIn.className = "flex-1 py-3 text-xs sm:text-sm font-bold rounded-xl bg-aw-navy text-white shadow-md transition-all";
+                btnOut.className = "flex-1 py-3 text-xs sm:text-sm font-bold rounded-xl text-slate-500 hover:text-slate-800 hover:bg-white transition-all";
                 title.innerText = "Check In Mode";
             } else {
-                btnOut.className = "flex-1 py-3 text-xs sm:text-sm font-bold rounded-xl bg-slate-800 text-white shadow-md transition-all";
-                btnIn.className = "flex-1 py-3 text-xs sm:text-sm font-bold rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all";
+                btnOut.className = "flex-1 py-3 text-xs sm:text-sm font-bold rounded-xl bg-aw-navy text-white shadow-md transition-all";
+                btnIn.className = "flex-1 py-3 text-xs sm:text-sm font-bold rounded-xl text-slate-500 hover:text-slate-800 hover:bg-white transition-all";
                 title.innerText = "Check Out Mode";
             }
         }
@@ -1196,10 +1327,10 @@
             const btn = document.getElementById('btn-toggle-camera');
             if(isRunning) {
                 btn.innerHTML = `<i class="fa-solid fa-stop mr-2"></i> Matikan Kamera`;
-                btn.className = "relative z-10 w-full sm:w-auto px-6 py-3.5 bg-red-500 hover:bg-red-600 text-white text-sm font-bold rounded-xl transition-all shadow-[0_4px_14px_rgba(239,68,68,0.3)]";
+                btn.className = "relative z-10 w-full px-6 py-3.5 bg-red-500 hover:bg-red-600 text-white text-sm font-bold rounded-xl transition-all shadow-[0_4px_14px_rgba(239,68,68,0.4)]";
             } else {
                 btn.innerHTML = `<i class="fa-solid fa-camera mr-2"></i> Nyalakan Kamera`;
-                btn.className = "relative z-10 w-full sm:w-auto px-6 py-3.5 bg-awBlue hover:bg-blue-800 text-white text-sm font-bold rounded-xl transition-all shadow-[0_4px_14px_rgba(0,32,178,0.3)]";
+                btn.className = "relative z-10 w-full px-6 py-3.5 bg-aw-blue hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-[0_4px_14px_rgba(37,99,235,0.4)]";
             }
         }
 
@@ -1229,7 +1360,6 @@
             });
         }
 
-        // INI DIA: SMART VALIDATION V4.0 (JP Berbasis Waktu & Nama Kelas)
         async function onScanSuccess(decodedText, decodedResult) {
             await stopScanner();
             updateBtnUI(false);
@@ -1242,7 +1372,6 @@
             const namaUser = appState.user.namaLengkap;
 
             try {
-                // 1. Translasi ID Kelas ("CLS-29" -> "11 DI")
                 const { data: classData } = await supabaseClient.from('master_kelas').select('kelas').eq('id_kelas', qrCodeClass).single();
                 if(!classData) {
                     showScanModal({ status: 'error', message: `QR Code tidak dikenali oleh sistem.`});
@@ -1250,7 +1379,6 @@
                 }
                 const namaKelasAsli = classData.kelas;
 
-                // 2. Tentukan Sesi JP Saat Ini (Berdasarkan Tabel Pengaturan)
                 const { data: jpData } = await supabaseClient.from('pengaturan')
                     .select('nama_pengaturan, nilai')
                     .eq('hari', hariIni).eq('tipe', 'Reguler').like('nama_pengaturan', 'JP %')
@@ -1260,7 +1388,6 @@
                 if(jpData) {
                     for(let i=0; i < jpData.length; i++) {
                         let waktuMulai = jpData[i].nilai;
-                        // Toleransi: Mulai 15 Menit Sebelum JP, Berakhir 60 Menit Setelahnya
                         let toleransiAwal = adjustTimeStr(waktuMulai, -15);
                         let toleransiAkhir = adjustTimeStr(waktuMulai, 60); 
                         
@@ -1276,13 +1403,12 @@
                     document.getElementById('scan-loading-overlay').classList.add('hidden'); return;
                 }
 
-                // 3. Validasi Silang Jadwal (Reguler / Infal)
                 const { data: jadData } = await supabaseClient.from('master_jadwal').select('id')
                     .eq('guru', namaUser).eq('kelas', namaKelasAsli).eq('hari', hariIni).eq('sesi_jp', activeJP).single();
                 
                 let isAuthorized = !!jadData;
 
-                if(!isAuthorized) { // Cek Infal
+                if(!isAuthorized) {
                     const { data: infData } = await supabaseClient.from('data_infal').select('id')
                         .eq('guru_pengganti', namaUser).eq('id_kelas', namaKelasAsli).eq('tanggal', tglIni).eq('sesi_jp', activeJP).single();
                     if(infData) isAuthorized = true;
@@ -1293,7 +1419,6 @@
                     document.getElementById('scan-loading-overlay').classList.add('hidden'); return;
                 }
 
-                // 4. Pencatatan Check-In / Check-Out
                 const { data: existLog } = await supabaseClient.from('log_cico').select('id, waktu_out')
                     .eq('tanggal', tglIni).eq('nama_guru', namaUser).eq('id_kelas', qrCodeClass).eq('sesi_jp', activeJP).single();
 
@@ -1307,7 +1432,7 @@
                         if(error) throw error;
                         showScanModal({ status: 'success', message: `Berhasil masuk ke ${namaKelasAsli} (${activeJP}).`, waktu: jamIni });
                     }
-                } else { // CHECK OUT
+                } else {
                     if (!existLog) {
                         showScanModal({ status: 'error', message: `Anda belum Check-In di ${namaKelasAsli} pada ${activeJP}.`});
                     } else if (existLog.waktu_out) {
@@ -1331,17 +1456,17 @@
             if(res.status === 'success') {
                 const icon = appState.scanMode === 'in' ? 'fa-check' : 'fa-person-walking-arrow-right';
                 content.innerHTML = `
-                    <div class="w-20 h-20 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-4 relative">
+                    <div class="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-5 relative shadow-inner border border-emerald-100">
                         <i class="fa-solid ${icon} relative z-10"></i><div class="absolute inset-0 border-4 border-emerald-500 rounded-full animate-ping opacity-20"></div>
                     </div>
-                    <h3 class="font-extrabold text-slate-800 text-2xl mb-2">Akses Diterima</h3>
+                    <h3 class="font-black text-slate-800 text-2xl mb-2">Akses Diterima</h3>
                     <p class="text-slate-500 font-medium text-sm px-2">${res.message}</p>
-                    <div class="mt-4 inline-block bg-emerald-50 border border-emerald-100 px-4 py-1.5 rounded-lg text-emerald-700 font-bold text-lg">${res.waktu}</div>
+                    <div class="mt-4 inline-block bg-emerald-50 border border-emerald-200 px-4 py-1.5 rounded-xl text-emerald-700 font-bold text-lg">${res.waktu}</div>
                 `;
             } else {
                 content.innerHTML = `
-                    <div class="w-20 h-20 bg-rose-100 text-rose-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-4 relative"><i class="fa-solid fa-xmark relative z-10"></i></div>
-                    <h3 class="font-extrabold text-slate-800 text-2xl mb-2">Akses Ditolak</h3>
+                    <div class="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-5 relative shadow-inner border border-red-100"><i class="fa-solid fa-xmark relative z-10"></i></div>
+                    <h3 class="font-black text-slate-800 text-2xl mb-2">Akses Ditolak</h3>
                     <p class="text-slate-500 font-medium text-sm px-2">${res.message}</p>
                 `;
             }
