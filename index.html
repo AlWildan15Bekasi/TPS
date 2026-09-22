@@ -1371,6 +1371,7 @@
             const namaUser = appState.user.namaLengkap;
 
             try {
+                // 1. Translasi ID Kelas ("CLS-29" -> "11 DI")
                 const { data: classData } = await supabaseClient.from('master_kelas').select('kelas').eq('id_kelas', qrCodeClass).single();
                 if(!classData) {
                     showScanModal({ status: 'error', message: `QR Code tidak dikenali oleh sistem.`});
@@ -1378,50 +1379,57 @@
                 }
                 const namaKelasAsli = classData.kelas;
 
-                const { data: jpData } = await supabaseClient.from('pengaturan')
-                    .select('nama_pengaturan, nilai')
-                    .eq('hari', hariIni).eq('tipe', 'Reguler').like('nama_pengaturan', 'JP %')
-                    .order('nilai');
-                
-                let activeJP = null;
-                if(jpData) {
-                    for(let i=0; i < jpData.length; i++) {
-                        let waktuMulai = jpData[i].nilai;
-                        let toleransiAwal = adjustTimeStr(waktuMulai, -15);
-                        let toleransiAkhir = adjustTimeStr(waktuMulai, 15); 
-                        
-                        if(jamIni >= toleransiAwal && jamIni <= toleransiAkhir) {
-                            activeJP = jpData[i].nama_pengaturan;
-                            break;
+                // ==========================================
+                // LOGIKA CHECK-IN
+                // ==========================================
+                if (appState.scanMode === 'in') {
+                    // 2. Tentukan Sesi JP Saat Ini (Berdasarkan Tabel Pengaturan)
+                    const { data: jpData } = await supabaseClient.from('pengaturan')
+                        .select('nama_pengaturan, nilai')
+                        .eq('hari', hariIni).eq('tipe', 'Reguler').like('nama_pengaturan', 'JP %')
+                        .order('nilai');
+                    
+                    let activeJP = null;
+                    if(jpData) {
+                        for(let i=0; i < jpData.length; i++) {
+                            let waktuMulai = jpData[i].nilai;
+                            // Toleransi Check-In: Mulai 5 Menit Sebelum JP, Berakhir 15 Menit Setelahnya
+                            let toleransiAwal = adjustTimeStr(waktuMulai, -5);
+                            let toleransiAkhir = adjustTimeStr(waktuMulai, 15); 
+                            
+                            if(jamIni >= toleransiAwal && jamIni <= toleransiAkhir) {
+                                activeJP = jpData[i].nama_pengaturan;
+                                break;
+                            }
                         }
                     }
-                }
 
-                if(!activeJP) {
-                    showScanModal({ status: 'error', message: `Tidak ada sesi JP aktif pada jam ${jamIni}. Cek kembali jadwal.`});
-                    document.getElementById('scan-loading-overlay').classList.add('hidden'); return;
-                }
+                    if(!activeJP) {
+                        showScanModal({ status: 'error', message: `Tidak ada sesi JP aktif pada jam ${jamIni} untuk Check-In.`});
+                        document.getElementById('scan-loading-overlay').classList.add('hidden'); return;
+                    }
 
-                const { data: jadData } = await supabaseClient.from('master_jadwal').select('id')
-                    .eq('guru', namaUser).eq('kelas', namaKelasAsli).eq('hari', hariIni).eq('sesi_jp', activeJP).single();
-                
-                let isAuthorized = !!jadData;
+                    // 3. Validasi Silang Jadwal (Reguler / Infal)
+                    const { data: jadData } = await supabaseClient.from('master_jadwal').select('id')
+                        .eq('guru', namaUser).eq('kelas', namaKelasAsli).eq('hari', hariIni).eq('sesi_jp', activeJP).single();
+                    
+                    let isAuthorized = !!jadData;
 
-                if(!isAuthorized) {
-                    const { data: infData } = await supabaseClient.from('data_infal').select('id')
-                        .eq('guru_pengganti', namaUser).eq('id_kelas', namaKelasAsli).eq('tanggal', tglIni).eq('sesi_jp', activeJP).single();
-                    if(infData) isAuthorized = true;
-                }
+                    if(!isAuthorized) { // Cek Infal
+                        const { data: infData } = await supabaseClient.from('data_infal').select('id')
+                            .eq('guru_pengganti', namaUser).eq('id_kelas', namaKelasAsli).eq('tanggal', tglIni).eq('sesi_jp', activeJP).single();
+                        if(infData) isAuthorized = true;
+                    }
 
-                if(!isAuthorized) {
-                    showScanModal({ status: 'error', message: `Anda tidak ada jadwal di kelas ${namaKelasAsli} pada ${activeJP}.`});
-                    document.getElementById('scan-loading-overlay').classList.add('hidden'); return;
-                }
+                    if(!isAuthorized) {
+                        showScanModal({ status: 'error', message: `Anda tidak ada jadwal di kelas ${namaKelasAsli} pada ${activeJP}.`});
+                        document.getElementById('scan-loading-overlay').classList.add('hidden'); return;
+                    }
 
-                const { data: existLog } = await supabaseClient.from('log_cico').select('id, waktu_out')
-                    .eq('tanggal', tglIni).eq('nama_guru', namaUser).eq('id_kelas', qrCodeClass).eq('sesi_jp', activeJP).single();
+                    // 4. Pencatatan Check-In
+                    const { data: existLog } = await supabaseClient.from('log_cico').select('id')
+                        .eq('tanggal', tglIni).eq('nama_guru', namaUser).eq('id_kelas', qrCodeClass).eq('sesi_jp', activeJP).single();
 
-                if (appState.scanMode === 'in') {
                     if (existLog) {
                         showScanModal({ status: 'error', message: `Anda sudah Check-In di kelas ${namaKelasAsli} pada ${activeJP} hari ini.`});
                     } else {
@@ -1431,18 +1439,59 @@
                         if(error) throw error;
                         showScanModal({ status: 'success', message: `Berhasil masuk ke ${namaKelasAsli} (${activeJP}).`, waktu: jamIni });
                     }
-                } else {
+
+                // ==========================================
+                // LOGIKA CHECK-OUT
+                // ==========================================
+                } else { 
+                    // 1. Cek apakah ada record Check-In yang belum di Check-Out
+                    const { data: existLog } = await supabaseClient.from('log_cico').select('id, sesi_jp, waktu_in, waktu_out')
+                        .eq('tanggal', tglIni).eq('nama_guru', namaUser).eq('id_kelas', qrCodeClass).is('waktu_out', null).single();
+
                     if (!existLog) {
-                        showScanModal({ status: 'error', message: `Anda belum Check-In di ${namaKelasAsli} pada ${activeJP}.`});
-                    } else if (existLog.waktu_out) {
-                        showScanModal({ status: 'error', message: `Anda sudah Check-Out dari ${namaKelasAsli} pada ${activeJP}.`});
-                    } else {
-                        const { error } = await supabaseClient.from('log_cico').update({ waktu_out: jamIni }).eq('id', existLog.id);
-                        if(error) throw error;
-                        showScanModal({ status: 'success', message: `Berhasil keluar dari ${namaKelasAsli} (${activeJP}).`, waktu: jamIni });
+                         // Cek apakah sebenarnya udah checkout sebelumnya
+                         const { data: alreadyOut } = await supabaseClient.from('log_cico').select('id')
+                             .eq('tanggal', tglIni).eq('nama_guru', namaUser).eq('id_kelas', qrCodeClass).not('waktu_out', 'is', null).single();
+                         
+                         if(alreadyOut) {
+                             showScanModal({ status: 'error', message: `Anda sudah melakukan Check-Out dari kelas ini sebelumnya.`});
+                         } else {
+                             showScanModal({ status: 'error', message: `Anda belum Check-In di kelas ${namaKelasAsli} hari ini.`});
+                         }
+                         document.getElementById('scan-loading-overlay').classList.add('hidden'); return;
                     }
+
+                    const activeJP = existLog.sesi_jp;
+
+                    // 2. Cek Toleransi Waktu Check-Out berdasarkan tabel pengaturan
+                    const { data: jpTimeData } = await supabaseClient.from('pengaturan')
+                         .select('nilai').eq('hari', hariIni).eq('tipe', 'Reguler').eq('nama_pengaturan', activeJP).single();
+                    
+                    if (jpTimeData) {
+                        let waktuMulai = jpTimeData.nilai;
+                        // Toleransi Keluar = -10 menit sebelum jam berakhir s/d +10 menit setelah jam berakhir.
+                        // Karena 1 JP = 60 menit, toleransinya ada di menit ke-50 s/d menit ke-70 dari waktuMulai.
+                        let toleransiAwalOut = adjustTimeStr(waktuMulai, 50); 
+                        let toleransiAkhirOut = adjustTimeStr(waktuMulai, 70);
+
+                        if (jamIni < toleransiAwalOut) {
+                            showScanModal({ status: 'error', message: `Belum waktunya Check-Out! Kelas baru berakhir mendekati jam ${adjustTimeStr(waktuMulai, 60)}.`});
+                            document.getElementById('scan-loading-overlay').classList.add('hidden'); return;
+                        }
+                        if (jamIni > toleransiAkhirOut) {
+                            showScanModal({ status: 'error', message: `Batas waktu toleransi Check-Out untuk ${activeJP} sudah terlewat.`});
+                            document.getElementById('scan-loading-overlay').classList.add('hidden'); return;
+                        }
+                    }
+
+                    // 3. Proses Check-Out
+                    const { error } = await supabaseClient.from('log_cico').update({ waktu_out: jamIni }).eq('id', existLog.id);
+                    if(error) throw error;
+                    showScanModal({ status: 'success', message: `Berhasil keluar dari ${namaKelasAsli} (${activeJP}).`, waktu: jamIni });
                 }
+
             } catch(e) {
+                console.error("Scan Error: ", e);
                 showScanModal({ status: 'error', message: "Gagal memproses validasi ke database."});
             }
 
