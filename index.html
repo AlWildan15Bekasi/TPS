@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -1389,7 +1388,7 @@
                     for(let i=0; i < jpData.length; i++) {
                         let waktuMulai = jpData[i].nilai;
                         let toleransiAwal = adjustTimeStr(waktuMulai, -15);
-                        let toleransiAkhir = adjustTimeStr(waktuMulai, 60); 
+                        let toleransiAkhir = adjustTimeStr(waktuMulai, 15); 
                         
                         if(jamIni >= toleransiAwal && jamIni <= toleransiAkhir) {
                             activeJP = jpData[i].nama_pengaturan;
